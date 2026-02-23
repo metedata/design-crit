@@ -71,14 +71,18 @@ buttons, `--accent` fill on active. Dark mode toggle (visual facets only): small
 
 ## 5. Option Cards (compare.html)
 
-Card: `--surface-raised`, subtle border, `8px` radius, no shadow. Iframe fills card width
-with `min-height: 480px` (not a fixed aspect ratio — let the iframe be tall enough to
-show the wireframe without internal scrolling). `border-radius: 8px 8px 0 0`, inset shadow
-`inset 0 0 0 1px rgba(255,255,255,0.04)`.
+Card: `--surface-raised`, subtle border, `8px` radius, no shadow. `border-radius: 8px 8px 0 0`
+on the iframe, inset shadow `inset 0 0 0 1px rgba(255,255,255,0.04)`.
 
-For 2-option layouts, iframes can be even taller (`min-height: 560px`) since there is more
-horizontal space. The goal: the wireframe is visible at a glance without scrolling inside
-the iframe.
+**Iframe sizing is adaptive, not fixed.** The LLM chooses the iframe dimensions based on
+the content shape and the layout chosen for this compare view (see `crit-loop.md`):
+- Desktop wireframes: landscape aspect, prioritize width (`min-height: 400px`)
+- Mobile wireframes: portrait aspect, prioritize height (`min-height: 600px`, narrower width)
+- Component-level facets (buttons, spacing, icons): can be compact (`min-height: 300px`)
+- Full-page layouts: maximize available space
+
+The goal: the wireframe is visible at a glance without scrolling inside the iframe.
+When in doubt, make the iframe bigger.
 
 Below iframe: "Open in new tab" link (11px, `--text-muted`, right-aligned). Option name
 (15px/600/`--text-primary`). Three rationale sections with 11px uppercase labels
@@ -189,9 +193,14 @@ rounds, options, feedback excerpts, elimination rationale.
 
 ## 11. Responsive
 
-Desktop-first. Above 1024px: side-by-side cards per `crit-loop.md` layout rules.
-768-1024px: stack cards vertically. Below 768px: single column, simplified banner.
-Min touch target: `36px`.
+Desktop-first. The compare view layout is chosen per-facet by the LLM (see
+`crit-loop.md` Layout Goals) — there is no single fixed grid for all compare views.
+
+General responsive behavior regardless of chosen layout:
+- Below 768px: stack all cards vertically, simplified banner, single column.
+- Min touch target: `36px`.
+- Iframe min-height should adapt to content shape (portrait mobile frames need
+  more height, landscape desktop frames need more width).
 
 ---
 

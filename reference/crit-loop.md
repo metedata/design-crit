@@ -10,19 +10,67 @@
 
 ## 1. Compare View HTML Generation
 
-Generate `.design-crit/facets/{facet-id}/compare.html`. Desktop-first, side-by-side layout.
-Options must always be visible simultaneously. Follow `./crit-ui.md` (in this same directory) for all styling.
+Generate `.design-crit/facets/{facet-id}/compare.html`. Follow `./crit-ui.md` (in this
+same directory) for colors, typography, and component specs.
 
-### Layout Rules
+### Layout Goals
 
-| Option Count | Layout |
+The compare view layout is **not fixed** — choose the layout that best serves the
+content being compared. The LLM decides the layout for each compare view based on
+the facet, platform, and content type. The goals are:
+
+1. **Every option must be clearly visible.** The user should be able to see enough of
+   each option to understand the design concept without excessive scrolling.
+2. **Options must be comparable.** The user needs to evaluate options relative to each
+   other. Side-by-side is ideal when options fit. Tabbed or toggle views work when
+   they don't.
+3. **The wireframe is the hero.** Maximize the space given to the iframe previews.
+   Rationale text is important but secondary — it should not compete with the visual.
+4. **No horizontal scrolling.** The layout must fit the browser viewport width.
+5. **Adapt to the content shape.** A desktop app wireframe is landscape. A mobile
+   screen is portrait. A data table is wide. A form is narrow. The layout should
+   match the shape of what's being shown.
+
+### Layout Toolkit
+
+Use these as a starting point. Mix and adapt as needed.
+
+**Side-by-side columns** — Best when options have a similar, compact shape (mobile
+screens, component variants, icon sets). Use CSS grid with equal columns. Works well
+for 2-3 options when each option fits in ~400px+ width.
+
+**Stacked full-width** — Best when each option needs maximum horizontal space (desktop
+wireframes, wide dashboards, navigation bars). Stack options vertically, each getting
+the full content width. The user scrolls down to compare. Add a sticky nav or anchor
+links so they can jump between options.
+
+**Tabbed / toggle view** — Best when options are complex full-page layouts that need
+the entire viewport to evaluate. Show one option at a time with tabs or a segmented
+control to switch. Add a subtle transition so the user can mentally diff them.
+
+**2x2 grid** — Best for 4 options when each is relatively compact (color palettes,
+spacing scales, typography samples, icon styles). Each cell should still be large
+enough that the content is legible without zooming.
+
+**Hybrid** — Combine approaches. For example: side-by-side iframes at the top (visual
+comparison) with a stacked rationale section below each (reading comparison). Or tabs
+for the iframe preview with a persistent summary panel showing all options' key traits.
+
+### How to Choose
+
+Consider these factors when selecting a layout:
+
+| Factor | Guidance |
 |---|---|
-| 2 | 50/50 horizontal split, full viewport height |
-| 3 | 33/33/33 row |
-| 4 | 2x2 grid |
-| 5+ | 2-column scrollable grid (rare, early divergent rounds only) |
+| **Platform** | Desktop wireframes → stacked full-width or tabs. Mobile wireframes → side-by-side (portrait frames fit well in columns). |
+| **Facet type** | Structural facets (navigation, layout, screen inventory) → need width, lean toward stacked or tabbed. Visual facets (color, typography, density) → can be more compact, lean toward side-by-side or grid. |
+| **Option count** | 2 options → side-by-side works great. 3-4 → depends on content shape. 4+ → grid or tabbed. |
+| **Content complexity** | Simple patterns (buttons, spacing) → side-by-side grid. Complex screens (full dashboards) → stacked or tabbed. |
+| **Round number** | Round 1 (many options, divergent) → grid or compact side-by-side. Later rounds (2 survivors) → give each option more space. |
 
-Use CSS grid. Each cell must scale proportionally. No horizontal scrolling.
+**When in doubt, favor giving each option more space over fitting them all on screen
+at once.** A user who can clearly see one option and tab to the next makes better
+decisions than a user squinting at four tiny iframes.
 
 ### Context Banner
 
@@ -96,11 +144,13 @@ Each option lives at `.design-crit/facets/{facet-id}/option-{x}.html`.
 ### Content Constraints for Iframed Display
 
 Option files are primarily viewed inside iframes in the compare view. Design them to
-be **scannable at a glance**, not pages that require scrolling to understand.
+be **scannable at a glance**, not pages that require excessive scrolling to understand.
+
+The available iframe size depends on the compare view layout chosen for this facet
+(see Section 1). A full-width stacked layout gives ~1200px width. A 3-column
+side-by-side gives ~400px per option. Design the wireframe for the layout you chose.
 
 **Rules:**
-- **Fit the viewport.** The wireframe should communicate its design concept within a
-  single viewport (roughly 16:10 aspect ratio at ~600px height). Minimal or no scrolling.
 - **Show the pattern, not the content.** Use 3-5 representative items, not 20. Show one
   complete interaction, not every edge case. The wireframe demonstrates the *structure*,
   not the *content*.
@@ -108,8 +158,11 @@ be **scannable at a glance**, not pages that require scrolling to understand.
   the concept requires paragraphs, that belongs in the rationale text outside the iframe.
 - **Single-screen focus.** Each option shows ONE screen or ONE state. Multi-screen flows
   should be broken into separate options or shown as a simplified flow diagram.
-- **Scale-friendly.** Text must be legible at the iframe display size (~400-600px wide).
-  Use 13-16px base font sizes. Avoid tiny details that require zooming.
+- **Scale-friendly.** Text must be legible at the iframe display size. Use 13-16px base
+  font sizes for side-by-side layouts, larger if the option gets full-width.
+- **Match the shape.** A mobile wireframe should be rendered in a portrait container.
+  A desktop wireframe should be landscape. A component sample can be compact. Don't
+  force all wireframes into the same aspect ratio.
 
 ### Persistence Across Rounds
 
