@@ -5,7 +5,7 @@ description: Use when evaluating font selection, type scale, typographic hierarc
 
 # Typography Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are critting typography -- font selection, type scale, hierarchy expression through type, and text readability. Typography is how the design speaks. It carries the content hierarchy into visible form, sets the product's tone, and determines whether users can comfortably read and scan every screen. Good typography is invisible; bad typography is the first thing users feel (even if they cannot name it).
 

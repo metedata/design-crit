@@ -5,7 +5,7 @@ description: Use when evaluating depth, layering, shadow systems, surface treatm
 
 # Elevation & Shape Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are critting elevation and shape -- the Z-axis strategy, shadow systems, surface treatments, and shape language that give a design its sense of depth and materiality. Elevation tells users what sits on top of what. Shape language (border radius, corner treatments) communicates brand tone and functional grouping. Together, they turn flat rectangles into a layered, tangible interface.
 

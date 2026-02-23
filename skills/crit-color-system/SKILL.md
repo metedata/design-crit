@@ -5,7 +5,7 @@ description: Use when evaluating color palettes, theming, dark mode, contrast, a
 
 # Color System Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing the color system for this project. Color is a sensory facet --
 it applies to surfaces and content structures that are already locked. Your job: generate
@@ -20,8 +20,8 @@ Before generating any options, read these files in order:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief (brand tone, platform, audience)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions
 

@@ -5,7 +5,7 @@ description: Use when identifying and evaluating the complete set of screens, st
 
 # Screen Inventory & Flows
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer inventorying the complete set of screens, states, and user flows for this
 product. This is almost always the first facet -- everything downstream depends on knowing
@@ -24,8 +24,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current project state, round number, prior feedback
 2. `.design-crit/brief.md` -- the confirmed design brief
-3. `reference/crit-loop.md` -- shared crit loop mechanics (compare view, feedback, convergence)
-4. `reference/design-principles.md` -- option generation principles, persona guidance
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics (compare view, feedback, convergence)
+4. `../../reference/design-principles.md` -- option generation principles, persona guidance
 
 If this is round 2+, also read:
 5. `.design-crit/facets/screen-inventory/feedback-round-{N-1}.json` -- prior round feedback
@@ -269,7 +269,7 @@ Reference these patterns when explaining options to the user:
 
 ## 9. Crit Loop Execution
 
-Follow the crit loop mechanics from `reference/crit-loop.md` exactly:
+Follow the crit loop mechanics from `../../reference/crit-loop.md` exactly:
 
 1. Generate option HTML files in `.design-crit/facets/screen-inventory/`.
 2. Write `critique.md` with per-option rationale and a comparative take.

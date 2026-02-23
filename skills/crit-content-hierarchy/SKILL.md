@@ -5,7 +5,7 @@ description: Use when evaluating information hierarchy within screens — what's
 
 # Content Hierarchy Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are critting content hierarchy -- how information is prioritized, emphasized, and sequenced within each screen. This facet determines what the user sees first, what they see next, and what they have to hunt for. Good hierarchy makes a screen self-explanatory in seconds. Bad hierarchy makes every screen a puzzle.
 

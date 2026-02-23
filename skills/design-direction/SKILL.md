@@ -74,7 +74,7 @@ Organize by the three lenses:
 
 Write `.design-crit/direction.html`. This is the primary deliverable — a polished,
 self-contained HTML page presenting the complete design direction. Follow
-`reference/crit-ui.md` for exact colors, typography, spacing, and component specs.
+`../../reference/crit-ui.md` for exact colors, typography, spacing, and component specs.
 
 **Structure the page as follows:**
 

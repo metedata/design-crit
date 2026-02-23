@@ -5,7 +5,7 @@ description: Use when evaluating first-run experience, progressive disclosure, o
 
 # Onboarding Flows Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing how new users learn this product. Onboarding is the bridge
 between "I signed up" and "I get value." Every screen, tooltip, permission request, and
@@ -28,8 +28,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief (core loop, target users, complexity, differentiator)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions
 

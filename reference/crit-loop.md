@@ -3,7 +3,7 @@
 > Shared reference for all `crit-*` facet skills. Defines the compare view, feedback
 > round-trip, convergence guidance, and locking mechanics that every facet follows.
 >
-> **Visual design:** Read `reference/crit-ui.md` for exact colors, typography, spacing,
+> **Visual design:** Read `./crit-ui.md` (in this same directory) for exact colors, typography, spacing,
 > and component specs. Every generated HTML page must follow that design system.
 
 ---
@@ -11,7 +11,7 @@
 ## 1. Compare View HTML Generation
 
 Generate `.design-crit/facets/{facet-id}/compare.html`. Desktop-first, side-by-side layout.
-Options must always be visible simultaneously. Follow `reference/crit-ui.md` for all styling.
+Options must always be visible simultaneously. Follow `./crit-ui.md` (in this same directory) for all styling.
 
 ### Layout Rules
 

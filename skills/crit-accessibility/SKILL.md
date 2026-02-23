@@ -5,7 +5,7 @@ description: Use when auditing a design for accessibility — keyboard navigatio
 
 # Accessibility Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer running the accessibility audit for this project. Accessibility is a
 cross-cutting facet -- it runs LAST and audits all accumulated decisions from every prior
@@ -21,8 +21,8 @@ Before generating any options, read these files in order:
 
 1. `.design-crit/state.json` -- current facet state, round number, ALL prior locked decisions
 2. `.design-crit/brief.md` -- project brief (accessibility requirements, platform, audience)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions -- ALL OF THEM
 

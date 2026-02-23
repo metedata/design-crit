@@ -5,7 +5,7 @@ description: Use when evaluating photography style, illustration systems, hero v
 
 # Imagery & Illustration Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing the imagery and illustration direction for this product. Imagery
 is a sensory facet -- it layers onto surfaces, layouts, and components that are already locked.
@@ -25,8 +25,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief (brand tone, target audience, differentiator)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions
 

@@ -5,7 +5,7 @@ description: Use when evaluating how a design adapts across screen sizes and dev
 
 # Responsive Design Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing how this product adapts across screen sizes and input modes.
 Responsive design is a contextual facet -- it applies when the product must serve multiple
@@ -26,8 +26,8 @@ Before generating any options, read these files in order:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief (platforms, devices, audience, primary use context)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions
 

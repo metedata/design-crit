@@ -5,7 +5,7 @@ description: Use when evaluating interactive component patterns — buttons, for
 
 # Component Design Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are critting component design -- the interactive building blocks that users touch, click, and read. Buttons, forms, cards, modals, tables, toggles, selectors, alerts. This facet defines the component vocabulary: what patterns exist, how they behave across states, and whether they form a consistent, learnable system.
 

@@ -5,7 +5,7 @@ description: Use when designing empty states, error handling, offline behavior, 
 
 # Edge States
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer working through the non-happy-path states of every screen in the product.
 Empty states, error handling, loading, offline behavior, and boundary conditions. These are
@@ -24,8 +24,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current project state, round number, prior feedback
 2. `.design-crit/brief.md` -- the confirmed design brief
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles
 5. `.design-crit/facets/screen-inventory/{locked_option}.html` -- the locked screen inventory
 
 The locked screen inventory is the foundation. Every screen listed there needs edge state
@@ -300,7 +300,7 @@ Call these out in the critique when you see them in options or user feedback:
 
 ## 8. Crit Loop Execution
 
-Follow `reference/crit-loop.md` exactly:
+Follow `../../reference/crit-loop.md` exactly:
 
 1. Generate option HTML files in `.design-crit/facets/edge-states/`.
 2. Write `critique.md` with per-option rationale and a comparative take.

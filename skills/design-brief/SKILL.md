@@ -52,7 +52,7 @@ designed.
 
 ## 2. Evaluate Against the Brief Schema
 
-Read `reference/brief-template.md` now. It contains the full brief schema, evaluation rubric,
+Read `../../reference/brief-template.md` now. It contains the full brief schema, evaluation rubric,
 and example briefs. Use it as your scoring guide.
 
 The schema has eight fields:
@@ -69,7 +69,7 @@ The schema has eight fields:
 ### Scoring
 
 Score each field as **filled**, **partial**, or **empty** using the rubric in
-`reference/brief-template.md`. Then determine the sufficiency level:
+`../../reference/brief-template.md`. Then determine the sufficiency level:
 
 **Sufficient** -- Core loop + platform + scope are filled. Remaining fields are filled or
 partial. You have enough to draft a complete brief.

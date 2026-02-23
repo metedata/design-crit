@@ -17,7 +17,7 @@ Read these files before doing anything else:
 
 1. `.design-crit/brief.md` -- the confirmed design brief
 2. `.design-crit/state.json` -- current project state
-3. `reference/design-principles.md` -- the facet library, three lenses framework, dependency ordering rules, and default pipeline order
+3. `../../reference/design-principles.md` -- the facet library, three lenses framework, dependency ordering rules, and default pipeline order
 
 The design-principles reference contains the full facet library with universal/contextual flags, the three lenses framework, and dependency ordering rules. Do not duplicate that content here. Read it every time.
 

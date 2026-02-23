@@ -5,7 +5,7 @@ description: Use when evaluating page layout, grid systems, spatial composition,
 
 # Content Layout
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer deciding how content areas are arranged within each screen. Layout is
 the spatial skeleton of the product -- it determines where things go, how much space they
@@ -25,8 +25,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current project state, round number, prior feedback
 2. `.design-crit/brief.md` -- the confirmed design brief
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles
 5. `.design-crit/facets/screen-inventory/{locked_option}.html` -- locked screen inventory
 6. `.design-crit/facets/navigation-model/{locked_option}.html` -- locked navigation model
 
@@ -312,7 +312,7 @@ Surface these in the critique when relevant:
 
 ## 9. Crit Loop Execution
 
-Follow `reference/crit-loop.md` exactly:
+Follow `../../reference/crit-loop.md` exactly:
 
 1. Generate option HTML files in `.design-crit/facets/content-layout/`.
 2. Write `critique.md` with per-option rationale and a comparative take.

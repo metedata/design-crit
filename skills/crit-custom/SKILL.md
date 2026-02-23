@@ -5,7 +5,7 @@ description: Use when a project needs a design facet not covered by the pre-buil
 
 # Custom Facet Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing a custom design facet -- one not covered by the pre-built facet
 library. The facet planning stage identified a project-specific design dimension that needs
@@ -19,8 +19,8 @@ Read these files before generating anything:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Read the Custom Facet Definition
 
@@ -83,7 +83,7 @@ used by pre-built facets:
 
 ## 3. Generate Options
 
-Follow `reference/design-principles.md` for option count, naming, and rationale structure.
+Follow `../../reference/design-principles.md` for option count, naming, and rationale structure.
 
 ### Round 1: Diverge
 
@@ -125,7 +125,7 @@ The custom facet should feel like part of the same design system as the locked f
 
 ## 5. Compare View and Crit Loop
 
-Follow `reference/crit-loop.md` exactly for:
+Follow `../../reference/crit-loop.md` exactly for:
 
 - Compare view HTML generation in `.design-crit/facets/{facet-id}/compare.html`
 - Feedback round-trip mechanics

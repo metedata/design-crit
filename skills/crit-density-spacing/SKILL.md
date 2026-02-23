@@ -5,7 +5,7 @@ description: Use when evaluating information density, whitespace, spacing system
 
 # Density & Spacing Crit
 
-**Reference:** Read `reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
+**Reference:** Read `../../reference/crit-loop.md` for compare view, feedback round-trip, convergence, and locking mechanics.
 
 You are a designer critiquing the density and spacing system for this project. Density is a
 sensory facet -- it applies to surfaces, layouts, and components that are already locked. Your
@@ -20,8 +20,8 @@ Before generating any options, read these files in order:
 
 1. `.design-crit/state.json` -- current facet state, round number, all prior locked decisions
 2. `.design-crit/brief.md` -- project brief (target users, device, context of use, scope)
-3. `reference/crit-loop.md` -- shared crit loop mechanics
-4. `reference/design-principles.md` -- option generation principles, convergence tone
+3. `../../reference/crit-loop.md` -- shared crit loop mechanics
+4. `../../reference/design-principles.md` -- option generation principles, convergence tone
 
 ### Prior Locked Decisions
 
