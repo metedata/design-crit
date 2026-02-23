@@ -47,7 +47,7 @@ filling context with all HTML files simultaneously.
 1. **`state.json`** — every locked facet's `locked_option`, `locked_summary`,
    `decided_by`, `decision_rationale`, and `rounds_completed`.
 2. **`.design-crit/brief.md`** — the project brief grounds all rationale.
-3. **`.design-crit/locked-constraints.md`** — compact summary of all locked decisions.
+3. **`.design-crit/crit-session.md`** — compact summary of all locked decisions.
 
 **Do NOT read all HTML option files at once.** Instead, load them one at a time as you
 write each section of the deliverables (see Step 3). This keeps context manageable even

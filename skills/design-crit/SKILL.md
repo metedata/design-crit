@@ -168,7 +168,7 @@ Example re-entry message:
 When a facet skill reports that it has locked a decision (or the user skipped a facet):
 
 1. Update state.json: set the facet's status and clear `current_facet`.
-2. Update `locked-constraints.md` (Step 4a).
+2. Update `crit-session.md` (Step 4a).
 3. Regenerate overview.html (Step 4).
 4. Open the overview page so the user sees progress.
 5. Identify the next facet per Rule C logic.
@@ -182,7 +182,7 @@ If the facet that just locked was the last one, follow Rule D instead.
 
 ## Step 4a: Update Locked Constraints File
 
-After every lock, regenerate `.design-crit/locked-constraints.md`. This file is the
+After every lock, regenerate `.design-crit/crit-session.md`. This file is the
 compressed memory of the entire crit — locked decisions, user intent, and emerging
 preferences. It replaces the need to load full HTML files or raw feedback JSON.
 
@@ -198,7 +198,7 @@ preferences. It replaces the need to load full HTML files or raw feedback JSON.
 **Format:**
 
 ```markdown
-# Locked Design Constraints
+# Crit Session Context
 
 ## Emerging Preferences
 [2-4 sentences summarizing cross-cutting patterns from all feedback so far.
