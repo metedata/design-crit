@@ -38,20 +38,30 @@ Only proceed with deliverable generation when ALL enabled facets are locked or s
 
 ---
 
-## 2. Gather All Locked Decisions
+## 2. Gather Locked Decisions (Context-Efficient)
 
-Read the full state to build a complete picture:
+This is the one stage that needs the full picture, but load strategically to avoid
+filling context with all HTML files simultaneously.
 
-1. **Read `state.json`** — collect every locked facet's `locked_option`, `locked_summary`,
+**Read upfront (small files):**
+1. **`state.json`** — every locked facet's `locked_option`, `locked_summary`,
    `decided_by`, `decision_rationale`, and `rounds_completed`.
-2. **Read `.design-crit/brief.md`** — the project brief grounds all rationale.
-3. **Read each locked facet's winning option file** — load
-   `.design-crit/facets/{facet-id}/{locked_option}.html` for every locked facet.
-4. **Read each facet's `critique.md`** — collect the final comparative take and rationale.
-5. **Read all feedback files** — scan `.design-crit/facets/{facet-id}/feedback-round-*.json`
-   to reconstruct the full decision history per facet.
+2. **`.design-crit/brief.md`** — the project brief grounds all rationale.
+3. **`.design-crit/locked-constraints.md`** — compact summary of all locked decisions.
 
-Organize the collected decisions by the three lenses:
+**Do NOT read all HTML option files at once.** Instead, load them one at a time as you
+write each section of the deliverables (see Step 3). This keeps context manageable even
+for projects with 12+ facets.
+
+**Read per-facet (only when writing that facet's section):**
+4. **The facet's winning option file** — `.design-crit/facets/{facet-id}/{locked_option}.html`
+5. **The facet's `critique.md`** — final comparative take and rationale.
+6. **The facet's feedback files** — `feedback-round-*.json` for decision history.
+
+Load items 4-6 for one facet, write that facet's section in the deliverables, then move to
+the next facet. Do not accumulate all facets' HTML in context.
+
+Organize by the three lenses:
 - **What exists** — screen inventory, edge states, onboarding flows
 - **How it's arranged** — navigation, layout, content hierarchy, components, elevation, data viz, responsive
 - **How it feels** — typography, color, density, iconography, motion, voice, imagery, loading

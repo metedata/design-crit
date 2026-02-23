@@ -102,27 +102,32 @@ surviving list in state.json.
 ### Round N Flow
 
 ```
-Claude reads:
-  1. state.json           -> current facet, round number, prior locked decisions
-  2. feedback-round-(N-1).json -> what to keep, cut, refine (skip for round 1)
-  3. surviving option files    -> current state of each survivor
+Claude reads (context-efficient order):
+  1. state.json                -> current facet, round number
+  2. locked-constraints.md     -> text summaries of ALL prior locked decisions (small file)
+  3. feedback-round-(N-1).json -> what to keep, cut, refine (skip for round 1)
+  4. surviving option files    -> ONLY this facet's survivors (not prior facets' HTML)
 
 Claude writes:
-  4. option-{x}.html files    -> generate new or refine existing
-  5. critique.md              -> per-option rationale + comparative take
-  6. compare.html             -> regenerated, iframes current options
-  7. Open compare.html in the user's browser
+  5. option-{x}.html files    -> generate new or refine existing
+  6. critique.md              -> per-option rationale + comparative take
+  7. compare.html             -> regenerated, iframes current options
+  8. Open compare.html in the user's browser
 
 User acts:
-  8. Reviews compare.html side by side
-  9. Marks Keep/Cut per option, writes comments
-  10. Clicks Save Feedback (or Skip / Decide For Me)
-  11. Browser writes feedback-round-N.json to disk
+  9. Reviews compare.html side by side
+  10. Marks Keep/Cut per option, writes comments
+  11. Clicks Save Feedback (or Skip / Decide For Me)
+  12. Browser writes feedback-round-N.json to disk
 
 Next turn:
-  12. User returns to Claude Code (or Claude detects the feedback file)
-  13. Claude reads feedback -> refine survivors / generate new options / suggest locking
+  13. User returns to Claude Code (or Claude detects the feedback file)
+  14. Claude reads feedback -> refine survivors / generate new options / suggest locking
 ```
+
+**IMPORTANT: Do NOT read prior facets' full HTML option files during the crit loop.** Use
+`locked-constraints.md` for prior decisions. See Section 7 (Context Efficiency) for the
+full loading strategy.
 
 ### Feedback JSON Schema
 
@@ -286,10 +291,16 @@ The overview page must show delegated decisions distinctly: "locked (auto)" vs "
 
 ### Constraint Propagation
 
-Before generating options for any facet, read ALL prior locked decisions. Load each locked
-facet's winning option file and `locked_summary` from state.json. Apply as constraints:
-locked layout = wireframe structure is fixed; locked color = palette is set; locked density =
-spacing scale is defined. State this in the critique: "Building on the locked [facet]: [summary]."
+Before generating options for any facet, read `.design-crit/locked-constraints.md`. This
+file contains a text summary of every prior locked decision — enough to inform new options
+without loading full HTML files into context.
+
+**Do NOT read prior facets' full HTML option files** unless you are directly modifying them
+(e.g., applying color to a locked layout wireframe). In that case, load only the specific
+file you need to edit, one at a time.
+
+Apply locked constraints and state them in the critique: "Building on the locked
+[facet]: [summary]."
 
 ### Overview Page Updates
 
@@ -304,3 +315,68 @@ After locking, regenerate `overview.html`:
 
 **Review** expands inline: options per round, user feedback excerpts, eliminations with
 reasons, final decision + rationale, and whether user-decided or LLM-delegated.
+
+---
+
+## 7. Context Efficiency
+
+HTML option files can be large. A full design crit with 10+ facets generates substantial
+content. These rules keep context usage sustainable across long sessions.
+
+### The `locked-constraints.md` File
+
+The orchestrator maintains `.design-crit/locked-constraints.md` — a single, compact file
+summarizing every locked decision in plain text. Updated after each facet locks.
+
+```markdown
+# Locked Design Constraints
+
+## What Exists
+- **Screen Inventory** — 7 screens: Dashboard, Capture, Search, Collections, Tags, Settings, Onboarding. Locked option: option-b.
+- **Edge States** — Instructional empty states with CTAs, inline validation, skeleton loading. Locked option: option-a.
+
+## How It's Arranged
+- **Navigation** — Deep sidebar with keyboard shortcuts, collapsible. 280px default width. Locked option: option-a.
+- **Layout** — Sidebar + content, 70/30 split, 12-column grid in content area. Locked option: option-c.
+
+## How It Feels
+- **Typography** — Inter for UI, JetBrains Mono for code. 1.25 scale, 6 levels. Locked option: option-b.
+```
+
+**This file is the primary context source for constraint propagation.** It replaces the
+need to read full HTML option files from prior facets. The summaries come from each facet's
+`locked_summary` field in state.json, enriched with key specifics from the critique.
+
+### Tiered HTML Loading
+
+Follow these rules for when to load full HTML option files:
+
+| Situation | What to Load |
+|---|---|
+| **Generating new options** for the current facet | Read `locked-constraints.md` for context. Do NOT read prior facets' HTML files. |
+| **Refining a surviving option** from the current facet | Read ONLY that option's HTML file. |
+| **Layering a new facet onto prior wireframes** (e.g., applying color to a locked layout) | Read ONLY the specific locked HTML file you are modifying, one at a time. |
+| **design-direction synthesis** (Stage 4) | Read locked HTML files one at a time per deliverable section, not all at once. |
+| **Reviewing a prior facet** (user clicks Review) | Read that single facet's locked option file and feedback files. |
+
+**Never** load all locked HTML files into context simultaneously during the crit loop.
+
+### Feedback File Loading
+
+Only read the **most recent** feedback file for the current facet:
+- Round 1: no prior feedback to read.
+- Round 2+: read `feedback-round-(N-1).json` only. Do NOT read all prior rounds.
+- Prior round history is preserved in the individual files and reconstructed by
+  `design-direction` at synthesis time.
+
+### Session Resilience
+
+All state lives on disk. If a session hits its context limit or the user starts a new one:
+- `/design-crit` reads `state.json` and picks up exactly where it left off.
+- No conversation history is needed — `locked-constraints.md`, feedback files, and option
+  HTML files are the source of truth.
+- The orchestrator's re-entry handling (Step 5) summarizes progress from files alone.
+
+Tell the user if context is getting long: "We've been at this for a while. You can start
+a fresh session anytime — just run `/design-crit` and I'll pick up where we left off.
+Everything is saved."

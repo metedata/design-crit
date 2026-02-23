@@ -168,14 +168,49 @@ Example re-entry message:
 When a facet skill reports that it has locked a decision (or the user skipped a facet):
 
 1. Update state.json: set the facet's status and clear `current_facet`.
-2. Regenerate overview.html (Step 4).
-3. Open the overview page so the user sees progress.
-4. Identify the next facet per Rule C logic.
-5. Announce the transition: "Navigation is locked as Deep Sidebar. Next up: Layout.
+2. Update `locked-constraints.md` (Step 4a).
+3. Regenerate overview.html (Step 4).
+4. Open the overview page so the user sees progress.
+5. Identify the next facet per Rule C logic.
+6. Announce the transition: "Navigation is locked as Deep Sidebar. Next up: Layout.
    This builds on your locked navigation and screen inventory."
-6. Invoke the next facet's skill.
+7. Invoke the next facet's skill.
 
 If the facet that just locked was the last one, follow Rule D instead.
+
+---
+
+## Step 4a: Update Locked Constraints File
+
+After every lock, regenerate `.design-crit/locked-constraints.md`. This is a compact
+text summary of all locked decisions — the primary context source for constraint
+propagation across facets. It replaces the need to load full HTML option files.
+
+**Format:**
+
+```markdown
+# Locked Design Constraints
+
+## What Exists
+- **Screen Inventory** — [locked_summary]. Locked option: [locked_option].
+
+## How It's Arranged
+- **Navigation** — [locked_summary]. Locked option: [locked_option].
+
+## How It Feels
+- **Typography** — [locked_summary]. Locked option: [locked_option].
+```
+
+For each locked facet, write one bullet with:
+- Facet name (bold)
+- The `locked_summary` from state.json (enriched with key specifics if the summary is thin)
+- Which option file was locked (so a facet skill can load it if it needs to directly edit it)
+
+Group by the three lenses. Omit lenses with no locked facets yet.
+
+**This file must stay small** — one line per locked facet. Target under 50 lines even for
+a 12-facet project. If context is getting long, tell the user: "You can start a fresh
+session anytime — just run `/design-crit` and I'll pick up where we left off."
 
 ---
 
