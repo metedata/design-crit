@@ -283,10 +283,15 @@ The overview page must show delegated decisions distinctly: "locked (auto)" vs "
 1. **Winner becomes canonical.** The locked option file is the source of truth for that facet.
 2. **Decision + rationale recorded in state.json** with `status`, `locked_option`,
    `locked_summary`, `decided_by` ("user" or "llm"), `decision_rationale`, `rounds_completed`.
-3. **Constraints carry forward.** All subsequent facets inherit locked decisions. When critting
-   color, the locked layout wireframe is the canvas. Read all prior locked option files before
-   generating new options.
-4. **Overview page updates.** Show locked facets with checkmark, winner name, and a **Review**
+3. **User signal extracted.** Read all feedback files for this facet. Distill the user's
+   comments into a single sentence of design intent. Not "kept option A" but what their
+   feedback *reveals* about their values and priorities. Write this to `locked-constraints.md`.
+4. **Emerging preferences updated.** After 2+ facets locked, look across all user signals
+   for recurring patterns. Update the Emerging Preferences section of `locked-constraints.md`.
+5. **Constraints carry forward.** All subsequent facets inherit locked decisions plus the
+   user's design voice. Read `locked-constraints.md` (not full HTML files) before generating
+   new options.
+6. **Overview page updates.** Show locked facets with checkmark, winner name, and a **Review**
    button that expands the full decision history inline.
 
 ### Constraint Propagation
@@ -331,21 +336,34 @@ summarizing every locked decision in plain text. Updated after each facet locks.
 ```markdown
 # Locked Design Constraints
 
+## Emerging Preferences
+User consistently values: keyboard-first interaction, minimal visual clutter, power-user
+density over consumer spaciousness. Prefers functional over decorative. Tends to cut
+options that prioritize aesthetics over efficiency.
+
 ## What Exists
-- **Screen Inventory** — 7 screens: Dashboard, Capture, Search, Collections, Tags, Settings, Onboarding. Locked option: option-b.
-- **Edge States** — Instructional empty states with CTAs, inline validation, skeleton loading. Locked option: option-a.
+- **Screen Inventory** — 7 screens: Dashboard, Capture, Search, Collections, Tags, Settings, Onboarding. Locked option: option-b. User signal: "I want fewer screens that do more, not a screen for everything."
+- **Edge States** — Instructional empty states with CTAs, inline validation, skeleton loading. Locked option: option-a. User signal: "Empty states should teach, not just decorate."
 
 ## How It's Arranged
-- **Navigation** — Deep sidebar with keyboard shortcuts, collapsible. 280px default width. Locked option: option-a.
-- **Layout** — Sidebar + content, 70/30 split, 12-column grid in content area. Locked option: option-c.
+- **Navigation** — Deep sidebar with keyboard shortcuts, collapsible. 280px default width. Locked option: option-a. User signal: "Keyboard shortcuts are non-negotiable. I want power users to never touch the mouse."
+- **Layout** — Sidebar + content, 70/30 split, 12-column grid in content area. Locked option: option-c. User signal: "Content area needs to breathe. The sidebar is for nav, not content."
 
 ## How It Feels
-- **Typography** — Inter for UI, JetBrains Mono for code. 1.25 scale, 6 levels. Locked option: option-b.
+- **Typography** — Inter for UI, JetBrains Mono for code. 1.25 scale, 6 levels. Locked option: option-b. User signal: "Readability over personality. This is a tool, not a brand."
 ```
 
-**This file is the primary context source for constraint propagation.** It replaces the
-need to read full HTML option files from prior facets. The summaries come from each facet's
-`locked_summary` field in state.json, enriched with key specifics from the critique.
+**This file is the primary context source for constraint propagation AND user intent.**
+It serves two purposes:
+1. **Locked decisions** — what was decided, with enough specifics to constrain future facets.
+2. **User signals** — a compressed one-line summary of WHY the user chose this direction,
+   distilled from their feedback comments across rounds. This carries the user's design
+   intent forward without loading raw feedback files.
+
+The **Emerging Preferences** section at the top captures cross-cutting patterns — design
+values that show up repeatedly across multiple facets. This is the user's "design voice"
+that develops as the crit progresses. Use it to inform option generation for future facets
+(e.g., if the user consistently prefers minimal, don't lead with maximalist options).
 
 ### Tiered HTML Loading
 

@@ -117,13 +117,14 @@ All state lives in a `.design-crit/` directory at the project root:
 
 **Key principles:**
 - `state.json` is the single source of truth the LLM reads each turn
-- `locked-constraints.md` is the primary context source for constraint propagation — a compact text summary of all locked decisions, replacing the need to load full HTML option files from prior facets
+- `locked-constraints.md` is the primary context source for constraint propagation AND user intent — contains locked decisions, compressed user signals (one sentence of design intent per facet, distilled from raw feedback), and an evolving "Emerging Preferences" section that captures cross-cutting patterns in the user's design voice
 - Individual option files persist across rounds — they get refined in place, gaining fidelity
 - `compare.html` is regenerated each round to compose current options
 - Feedback JSON files capture the round-trip from HTML back to Claude
 - Facet folders are numbered for ordering but the overview allows reordering
 - Locked facet decisions carry forward as constraints for later facets
-- **Context efficiency:** During the crit loop, only the current facet's HTML files are loaded. Prior facets are represented by `locked-constraints.md` (~1 line per facet). Full HTML is only loaded when directly editing a prior wireframe or during final synthesis. This keeps sessions sustainable across 10+ facets.
+- **Context efficiency:** During the crit loop, only the current facet's HTML files are loaded. Prior facets are represented by `locked-constraints.md` (~2 lines per facet: decision + user signal). Full HTML is only loaded when directly editing a prior wireframe or during final synthesis. Raw feedback JSON stays in individual files — only compressed user signals carry forward. This keeps sessions sustainable across 10+ facets.
+- **Feedback compression:** Raw feedback is never re-read in bulk. At lock time, the orchestrator distills all rounds of feedback into a single "user signal" sentence per facet. After 2+ facets, cross-cutting patterns are extracted into an "Emerging Preferences" section — the user's evolving design voice that calibrates future option generation.
 
 ## The Pipeline
 

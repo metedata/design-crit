@@ -182,35 +182,48 @@ If the facet that just locked was the last one, follow Rule D instead.
 
 ## Step 4a: Update Locked Constraints File
 
-After every lock, regenerate `.design-crit/locked-constraints.md`. This is a compact
-text summary of all locked decisions — the primary context source for constraint
-propagation across facets. It replaces the need to load full HTML option files.
+After every lock, regenerate `.design-crit/locked-constraints.md`. This file is the
+compressed memory of the entire crit — locked decisions, user intent, and emerging
+preferences. It replaces the need to load full HTML files or raw feedback JSON.
+
+**Three things to write per locked facet:**
+
+1. **The decision** — `locked_summary` from state.json, enriched with key specifics.
+2. **The locked option** — which file, so a facet skill can load it if needed.
+3. **The user signal** — a single sentence distilling WHY the user chose this direction.
+   Read the feedback files for this facet, extract the most revealing user comments, and
+   compress them into one line of intent. Not "user kept option A" but "user values
+   keyboard-first power-user workflows over visual discoverability."
 
 **Format:**
 
 ```markdown
 # Locked Design Constraints
 
+## Emerging Preferences
+[2-4 sentences summarizing cross-cutting patterns from all feedback so far.
+What does this user consistently value? What do they consistently reject?
+Update this section after every lock — it should evolve as the crit progresses.]
+
 ## What Exists
-- **Screen Inventory** — [locked_summary]. Locked option: [locked_option].
+- **Screen Inventory** — [locked_summary]. Locked option: [locked_option]. User signal: "[compressed intent]"
 
 ## How It's Arranged
-- **Navigation** — [locked_summary]. Locked option: [locked_option].
-
-## How It Feels
-- **Typography** — [locked_summary]. Locked option: [locked_option].
+- **Navigation** — [locked_summary]. Locked option: [locked_option]. User signal: "[compressed intent]"
 ```
 
-For each locked facet, write one bullet with:
-- Facet name (bold)
-- The `locked_summary` from state.json (enriched with key specifics if the summary is thin)
-- Which option file was locked (so a facet skill can load it if it needs to directly edit it)
+**Emerging Preferences section:** After 2+ facets are locked, look across all user signals
+for patterns. Does the user consistently prefer minimal over maximal? Functional over
+decorative? Familiar conventions over novel approaches? Write 2-4 sentences capturing
+these cross-cutting preferences. Update every time a facet locks — this section should
+grow richer as the crit progresses.
 
-Group by the three lenses. Omit lenses with no locked facets yet.
+**This is the user's design voice.** Future facet skills read it to calibrate option
+generation. If the user consistently cuts decorative options, don't lead with decorative
+options in the next facet.
 
-**This file must stay small** — one line per locked facet. Target under 50 lines even for
-a 12-facet project. If context is getting long, tell the user: "You can start a fresh
-session anytime — just run `/design-crit` and I'll pick up where we left off."
+Group decisions by the three lenses. Omit lenses with no locked facets yet. Target under
+60 lines even for a 12-facet project.
 
 ---
 
