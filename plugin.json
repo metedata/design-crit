@@ -1,0 +1,7 @@
+{
+  "name": "design-crit",
+  "description": "Structured design critique process that generates HTML wireframe artifacts for iterative, side-by-side review. Guides users from idea through brief, screen inventory, and visual design facets to a complete design direction.",
+  "author": {
+    "name": "Mete Polat"
+  }
+}
