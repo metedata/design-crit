@@ -112,6 +112,9 @@ new crit" (reset state.json).
 Generate or regenerate `.design-crit/overview.html` after every state change. This is the
 persistent progress dashboard. Single-page HTML, self-contained with inline CSS.
 
+**Visual design:** Read `reference/crit-ui.md` for exact colors, typography, spacing, and
+component specs. The overview page follows the same design system as all crit HTML pages.
+
 **Header:** Project name, brief summary (first 2-3 sentences from brief.md), pipeline
 progress indicator (Brief > Facets > Direction).
 

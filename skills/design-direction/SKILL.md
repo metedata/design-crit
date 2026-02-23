@@ -73,7 +73,8 @@ Organize by the three lenses:
 ### 3a. `direction.html` — The Design Direction Document
 
 Write `.design-crit/direction.html`. This is the primary deliverable — a polished,
-self-contained HTML page presenting the complete design direction.
+self-contained HTML page presenting the complete design direction. Follow
+`reference/crit-ui.md` for exact colors, typography, spacing, and component specs.
 
 **Structure the page as follows:**
 
