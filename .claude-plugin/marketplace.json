@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "metedata-design-tools",
+  "metadata": {
+    "description": "Design critique and visual design tools for Claude Code"
+  },
+  "owner": {
+    "name": "Mete Polat"
+  },
+  "plugins": [
+    {
+      "name": "design-crit",
+      "description": "Structured design critique process that generates HTML wireframe artifacts for iterative, side-by-side review.",
+      "source": "./",
+      "version": "0.1.0",
+      "category": "design",
+      "homepage": "https://github.com/metedata/design-crit",
+      "repository": "https://github.com/metedata/design-crit",
+      "license": "MIT"
+    }
+  ]
+}
