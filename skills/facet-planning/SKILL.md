@@ -3,11 +3,19 @@ name: facet-planning
 description: Use when a design brief is confirmed and the project needs a plan for which design facets to evaluate and in what order.
 ---
 
-# Facet Planning
+# Planning the Review
 
-You are a design lead planning a structured critique. The brief is confirmed. Your job: derive WHICH design facets this project needs and in WHAT order, then get the user's sign-off before any crit work begins.
+You are a design lead planning a structured critique. The brief is confirmed. Your job:
+figure out WHICH design areas this project needs to work through and in WHAT order, then
+get the user's sign-off before any design work begins.
 
-Derive facets from first principles -- analyze the brief, identify what decisions matter for THIS project, and select from the pre-built library. Do not apply a fixed checklist. A note-taking app and a data dashboard need different facets in different orders.
+Derive areas from first principles -- analyze the brief, identify what decisions matter
+for THIS project, and select from the pre-built library. Do not apply a fixed checklist.
+A note-taking app and a data dashboard need different areas in different orders.
+
+**User-facing language:** Always say "design area" or just "area" when talking to the
+user. Never say "facet" in user-facing output. Internally, the code and file paths
+still use "facet" -- that is fine. The user should never see that term.
 
 ---
 
@@ -17,9 +25,9 @@ Read these files before doing anything else:
 
 1. `.design-crit/brief.md` -- the confirmed design brief
 2. `.design-crit/state.json` -- current project state
-3. `../../reference/design-principles.md` -- the facet library, three lenses framework, dependency ordering rules, and default pipeline order
+3. `../../reference/design-principles.md` -- the area library, three lenses framework, dependency ordering rules, and default pipeline order
 
-The design-principles reference contains the full facet library with universal/contextual flags, the three lenses framework, and dependency ordering rules. Do not duplicate that content here. Read it every time.
+The design-principles reference contains the full library of design areas with universal/contextual flags, the three lenses framework, and dependency ordering rules. Do not duplicate that content here. Read it every time.
 
 ---
 
@@ -46,13 +54,13 @@ Read `.design-crit/brief.md` and extract these signals:
 
 ---
 
-## 3. Select Facets
+## 3. Select Design Areas
 
-Use the three lenses framework from `design-principles.md` to select facets.
+Use the three lenses framework from `design-principles.md` to select areas.
 
-### Universal Facets (consider for every project)
+### Core Areas (consider for every project)
 
-These 12 facets apply to nearly every project. Include them by default, then remove only with explicit reasoning:
+These 12 areas apply to nearly every project. Include them by default, then remove only with explicit reasoning:
 
 | Facet ID | Skill | What It Decides |
 |---|---|---|
@@ -69,9 +77,9 @@ These 12 facets apply to nearly every project. Include them by default, then rem
 | `content-voice` | `crit-content-voice` | Microcopy, error messages, tone, terminology |
 | `accessibility` | `crit-accessibility` | Keyboard, screen readers, contrast, ARIA |
 
-### Contextual Facets (include based on project type)
+### Situational Areas (include based on project type)
 
-These 7 facets apply only when the project warrants them:
+These 7 areas apply only when the project warrants them:
 
 | Facet ID | Skill | Include When |
 |---|---|---|
@@ -83,19 +91,27 @@ These 7 facets apply only when the project warrants them:
 | `imagery-illustration` | `crit-imagery-illustration` | Marketing sites, consumer apps, brand-heavy products |
 | `loading-performance` | `crit-loading-performance` | Async-heavy apps, data dashboards, slow-network contexts |
 
-### Custom Facets
+### Custom Areas
 
-If the brief reveals a design dimension not covered by the 19 pre-built facets, add a custom facet. Examples: "map interaction patterns" for a geo app, "audio player controls" for a music app, "real-time collaboration indicators" for a multiplayer tool.
+If the brief reveals a design dimension not covered by the 19 pre-built areas, add a
+custom one. Examples: "map interaction patterns" for a geo app, "audio player controls"
+for a music app, "real-time collaboration indicators" for a multiplayer tool.
 
-Custom facets use the `crit-custom` skill. Give each a clear id, name, and rationale explaining why it is needed and where it fits in the dependency order.
+Custom areas use the `crit-custom` skill. Give each a clear id, name, and rationale
+explaining why it is needed and where it fits in the order.
 
-### Selection Reasoning
+### Selection Reasoning (internal only)
 
-For each facet you include, write a one-sentence rationale tied to the brief. Not "this is a universal facet" but "the brief describes 7 screens with deep hierarchies -- navigation decisions constrain every layout downstream."
+For each area you include, write a one-sentence rationale tied to the brief. Not "this
+is a universal area" but "the brief describes 7 screens with deep hierarchies --
+navigation decisions constrain every layout downstream."
 
-For each universal facet you EXCLUDE, state why. Exclusion requires a reason: "component-design excluded because the brief specifies shadcn/ui with no custom components in v1 scope."
+For each core area you EXCLUDE, state why. Exclusion requires a reason:
+"component-design excluded because the brief specifies shadcn/ui with no custom components
+in v1 scope."
 
-**Typical project uses 8-12 facets.** If you have fewer than 6, you are likely under-scoping. If you have more than 15, you are likely over-scoping. Question both extremes.
+**Typical project uses 8-12 areas.** Fewer than 6 likely means under-scoping. More than
+15 likely means over-scoping. Question both extremes.
 
 ---
 
@@ -135,89 +151,92 @@ State the deviation and why: "Promoting color-system before density-spacing beca
 
 ## 5. Generate Overview HTML
 
-Generate `.design-crit/overview.html` with the proposed facet plan. This is the user's primary interface for reviewing and confirming the plan.
+Generate `.design-crit/overview.html` with the proposed plan. This is a visual reference,
+but NOT the primary way the user interacts. The terminal conversation is the primary flow.
 
 ### Layout
 
 Build a single-page HTML file with all CSS and JS inlined. No external dependencies.
+Follow `./crit-ui.md` for styling.
 
 **Header section:**
 - Project name and one-line description from the brief
-- Brief summary: platform, core loop, scope (3-4 lines max, extracted from brief.md)
+- A clear explanation: "Here's the plan for your design review. We'll work through each
+  area together, one at a time."
 
-**Facet plan section:**
-- Ordered list of proposed facets, each showing:
-  - Sequence number
-  - Facet name (human-readable, e.g., "Navigation Model")
-  - Mapped skill name (e.g., `crit-navigation`)
-  - Lens tag: "structural", "compositional", "sensory", or "cross-cutting"
-  - One-sentence rationale tied to the brief
-  - Dependency indicators: which prior facets this depends on (show as connected labels or arrows)
-  - Checkbox to enable/disable (checked by default for included facets)
+**Plan section:**
+- Ordered list of proposed areas, grouped by phase with plain labels:
+  - **"Defining the product"** (structural) -- what screens exist, edge cases, onboarding
+  - **"Arranging the pieces"** (compositional) -- navigation, layout, component patterns
+  - **"Making it feel right"** (sensory) -- typography, colors, spacing, motion
+- Each area shows: sequence number, human-readable name, one-sentence rationale
+- No technical skill names, no dependency arrows, no lens tags
+- Checkboxes for enable/disable (checked by default)
 
-**Interaction controls:**
-- Drag handles on each facet row for reordering (use native HTML5 drag-and-drop)
-- "Add Custom Facet" button at the bottom that reveals a form: name, description, lens category, position in order
-- Visual grouping by lens (structural / compositional / sensory / cross-cutting) with subtle section dividers
-
-**Confirmation area:**
-- Facet count summary: "12 facets selected (9 universal, 3 contextual)"
-- Estimated effort note: "Most facets resolve in 2 rounds. Estimated: 12-24 review rounds total."
-- **Confirm Plan** button (primary)
-- **Reset to Default** button (secondary) -- restores the LLM's original proposal
-
-**Confirm Plan behavior:**
-- Serialize the current plan state (enabled facets, order, custom additions) to JSON
-- Use the File System Access API to write `facet-plan-confirmation.json` to the `.design-crit/` directory
-- Fallback: display the JSON in a copyable textarea with instructions to paste into Claude Code
+**No File System Access API buttons.** Do not include a "Confirm Plan" button that
+writes to disk. The user confirms in the terminal.
 
 ### Styling
 
-Clean, professional. Light background, clear typography. Use the same design language as the compare view (consistent with `crit-loop.md` styling guidance). Include a dark mode toggle.
+Follow `./crit-ui.md` for all styling (dark chrome, clean typography). The overview
+page is an informational reference, not an interactive tool.
 
 ---
 
-## 6. User Confirmation
+## 6. Present the Plan Conversationally
 
 After generating `overview.html`, open it in the user's browser.
 
-Present the proposed plan in the terminal as well, using this format:
+**The terminal is the primary interface.** Present the plan conversationally. Explain
+what you're proposing and why, as if you're a designer walking a client through the
+process. Use this structure:
 
 ```
-Facet Plan for [Project Name]
-=============================
+Here's how I'd approach the design review for [Project Name].
 
-Based on the brief, I'm proposing [N] facets:
+We'll work through [N] design areas together, one at a time. For each one, I'll
+generate a few options as interactive wireframes, we'll look at them side by side,
+and you'll tell me what you like and what to cut. Most areas take about 2 rounds
+to nail down.
 
-WHAT EXISTS (structural):
-  1. Screen Inventory & Flows -- everything depends on knowing what surfaces exist
-  2. Edge States -- [rationale]
+Here's the order I'm proposing:
+
+FIRST, WE DEFINE WHAT EXISTS:
+  1. Screen Inventory — figure out what screens we need and how they connect
+  2. Edge States — what happens when things are empty, loading, or broken
   ...
 
-HOW IT'S ARRANGED (compositional):
-  3. Navigation Model -- [rationale]
-  4. Content Layout -- [rationale]
+THEN, WE ARRANGE THE PIECES:
+  3. Navigation — how users move between screens
+  4. Layout — how content is organized on each screen
   ...
 
-HOW IT FEELS (sensory):
-  7. Typography -- [rationale]
-  8. Color System -- [rationale]
+FINALLY, WE MAKE IT FEEL RIGHT:
+  7. Typography — fonts, sizes, hierarchy
+  8. Colors — palette, meaning, contrast
   ...
 
-CROSS-CUTTING:
-  [N]. Accessibility -- audits all accumulated decisions
+AND A FINAL CHECK:
+  [N]. Accessibility — making sure everything works for everyone
 
-Excluded: [list excluded universal facets with reasons]
+I've also opened a visual version of this plan in your browser.
 
-Review the full plan in your browser (overview.html) where you can
-reorder, enable/disable, or add custom facets. Or confirm here.
+Does this plan look right? You can:
+- Remove areas you don't think we need
+- Add something I missed
+- Change the order
+- Or just say "looks good" and we'll get started
 ```
 
-Ask the user to confirm. Accept confirmation via:
-1. The user clicks "Confirm Plan" in `overview.html` (writes `facet-plan-confirmation.json`)
-2. The user says "confirm", "looks good", "go ahead", or similar in the terminal
+**Key principles:**
+- Explain the process, not just the list. The user may not know what a structured
+  design review looks like.
+- Use everyday language. "Figure out what screens we need" not "screen inventory and
+  state maps."
+- Make it clear what you want: their approval or edits, via the chat.
+- The user confirms by replying in the terminal. No File System Access API buttons.
 
-If the user requests changes in the terminal, apply them and regenerate `overview.html`.
+If the user requests changes, apply them and regenerate `overview.html`.
 
 ---
 
@@ -253,11 +272,12 @@ Update `overview.html` to reflect the confirmed plan. Replace "Confirm Plan" wit
 
 ### Hand Off
 
-Announce the plan and start the first crit:
+Announce the plan in plain language and start the first area:
 
 ```
-Plan confirmed: [N] facets, starting with Screen Inventory & Flows.
-Invoking design-crit:crit-screen-inventory to begin the first crit.
+Great, the plan is locked in. Let's start with the first area: Screen Inventory.
+I'll generate a few options for what screens your app needs and how they connect,
+then we'll review them side by side.
 ```
 
 The orchestrator reads `state.json`, sees `facet_plan_status: confirmed` and `current_facet: screen-inventory`, and routes to `crit-screen-inventory`.

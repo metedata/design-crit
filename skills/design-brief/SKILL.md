@@ -50,12 +50,11 @@ designed.
 
 ---
 
-## 2. Evaluate Against the Brief Schema
+## 2. Assess What You Know
 
-Read `../../reference/brief-template.md` now. It contains the full brief schema, evaluation rubric,
-and example briefs. Use it as your scoring guide.
+Read `../../reference/brief-template.md` now. It contains the brief schema and examples.
 
-The schema has eight fields:
+A good brief covers eight things:
 
 1. **Project name and description** -- one clear sentence
 2. **Target users and context of use** -- persona, device, posture, environment, frequency
@@ -66,88 +65,94 @@ The schema has eight fields:
 7. **Existing design language** -- component library, brand, references, or "none"
 8. **Accessibility requirements** -- WCAG level, keyboard, screen reader, or "unknown"
 
-### Scoring
+Internally assess how much you know. **Never expose this assessment to the user.** No
+scores, no rubrics, no "sufficiency" labels. Just figure out which branch to take:
 
-Score each field as **filled**, **partial**, or **empty** using the rubric in
-`../../reference/brief-template.md`. Then determine the sufficiency level:
+**You know a lot** -- Core loop + platform + scope are clear. You can draft a complete brief.
 
-**Sufficient** -- Core loop + platform + scope are filled. Remaining fields are filled or
-partial. You have enough to draft a complete brief.
+**You know some** -- Critical fields like core loop, platform, or scope have gaps. You need
+2-3 answers before you can write a solid brief.
 
-**Partial** -- Some fields filled, but core loop, platform, or scope has gaps. You can draft
-most of the brief but need 2-3 answers to close critical gaps.
-
-**Minimal** -- Most fields empty. Vague idea, not a scoped project. You need to guide the
-user through brief creation field by field.
+**Starting from scratch** -- Most fields empty. You need to walk the user through it.
 
 ---
 
-## 3. Branch by Sufficiency Level
+## 3. Branch by What You Know
 
-### Branch A: Sufficient Context
+### Branch A: You Know a Lot
 
 You have enough to write the brief without asking questions.
 
 1. Draft the full brief in the schema format. Fill every field from harvested context.
-2. For any field scored "partial," include what you have and flag the gap inline:
+2. For any field you inferred or guessed, flag it inline:
    `(inferred from routes -- confirm this is complete)`.
-3. Generate `.design-crit/overview.html` showing the draft brief. The HTML must be:
+3. **Present the brief in the terminal first.** Show it directly in the chat so the user
+   can read it without leaving the terminal. Use clean markdown formatting.
+4. Generate `.design-crit/overview.html` showing the draft brief. The HTML must be:
    - Self-contained (inline CSS, no external dependencies).
    - Readable on desktop. Clean typography, clear section headings.
-   - Each field displayed with a visual indicator: green check (filled), yellow dot (partial),
-     red dash (empty).
-   - A **Confirm Brief** button and an **Edit** textarea per field so the user can adjust
-     inline.
-   - A note at the top: "This brief was drafted from your codebase and description. Review it,
-     edit any field, then confirm."
-4. Open `overview.html` in the user's browser.
-5. Tell the user: "I drafted a brief from your codebase. Open the overview to review it. Let me
-   know if anything needs adjustment, or confirm to proceed."
-6. Wait for the user to confirm or request changes.
-7. If the user provides edits, update the brief and regenerate overview.html. Repeat until
+   - No color-coded scoring indicators. Present each field cleanly.
+   - A note at the top: "This brief was drafted from your codebase and description."
+5. Open `overview.html` in the user's browser.
+6. **Ask 2-3 specific follow-up questions** to sharpen the brief. Even when you have
+   strong context, there are always design-relevant details the codebase cannot tell you.
+   Examples:
+   - "Your app has a dashboard and settings page. Is there a primary action users take
+     most often, or is it more of a monitoring tool?"
+   - "I see you're using Tailwind — do you have a visual style in mind, or should we
+     explore that from scratch?"
+   - "Is this mostly for desktop users, or do you need it to work well on phones too?"
+7. **Tell the user explicitly how to provide feedback:**
+   "I've also opened a formatted version in your browser. To continue, just reply here
+   in the chat — tell me what looks right, what needs changing, or say 'looks good' to
+   move on."
+8. Wait for the user to respond in the chat.
+9. If the user provides edits, update the brief and regenerate overview.html. Repeat until
    confirmed.
 
-### Branch B: Partial Context
+### Branch B: You Know Some
 
 You can draft most of the brief but critical fields are missing.
 
-1. Draft every field you can fill. Leave empty fields explicitly blank.
-2. Identify the 2-3 most impactful missing fields. Prioritize in this order:
+1. Draft every field you can fill. Leave unknown fields marked clearly.
+2. **Present what you have so far in the terminal.** Show it in the chat so the user
+   can see your progress. Frame it conversationally: "Here's what I've pieced together
+   so far. I have a few questions before I can finish the brief."
+3. Ask the user 2-3 targeted questions for the critical gaps. Be specific, not generic.
+   Prioritize in this order:
    - Core interaction loop (if missing, nothing else matters)
    - Platform and constraints (changes every design decision)
    - Scope (prevents designing features that won't ship)
    - Target users (changes density, touch targets, flow)
-3. Ask the user these 2-3 targeted questions. Be specific, not generic. Examples:
+4. Frame questions around why they matter for design:
    - BAD: "Can you tell me about your users?"
    - GOOD: "Your codebase is a React SPA -- are your users primarily on desktop, or do you
-     need mobile-responsive from day one?"
+     need mobile-responsive from day one? This changes how we think about layout."
    - BAD: "What's the scope?"
    - GOOD: "I see routes for dashboard, settings, and a profile page. Is there anything else
      in v1, or is that the full surface area?"
-4. Present what you have so far alongside your questions: "Here's what I've gathered so far.
-   I need a few answers to complete the brief."
-5. After receiving answers, merge them into the draft and proceed to Branch A (generate
-   overview.html, ask for confirmation).
+5. After receiving answers, merge them into the draft and proceed to Branch A (present
+   in terminal + generate overview.html, ask follow-up questions).
 
-### Branch C: Minimal Context
+### Branch C: Starting from Scratch
 
-Most fields are empty. You cannot draft a useful brief without guidance.
+Most fields are empty. You need to learn about the project first.
 
-1. Tell the user honestly: "I don't have enough context to draft a brief yet. Let me ask a
-   few questions to get us there."
+1. Tell the user conversationally: "I'd like to understand the project better before we
+   start designing. Let me ask a few questions."
 2. Ask ONE question at a time, in this order:
-   a. **Name + description:** "What is this project? One sentence."
-   b. **Core loop:** "What does a user do repeatedly? The one action that defines the product."
-   c. **Platform:** "Web app, mobile app, desktop app, or some combination?"
-   d. **Target users:** "Who uses this, and where? Phone on the go, or laptop at a desk?"
-   e. **Scope:** "What's in the first version? What's explicitly out?"
-   f. **Differentiator:** "What makes this different from [obvious alternative]? 'Nothing yet'
-      is a valid answer."
-3. After each answer, acknowledge it and ask the next question. Do not batch questions -- the
-   user needs to think through each one.
-4. After you have answers for at least name, core loop, and platform, draft the brief with
-   what you have and proceed to Branch A.
-5. Remaining empty fields get marked: `(not yet defined -- will surface during crit)`.
+   a. "What is this project? Give me the one-sentence version."
+   b. "What's the main thing a user does in it? The action they'd repeat most often."
+   c. "Web app, mobile app, desktop app, or some combination?"
+   d. "Who uses this, and where? Phone on the go, or laptop at a desk?"
+   e. "What's in the first version? And what's explicitly NOT in it yet?"
+   f. "What makes this different from [obvious alternative]? 'Nothing yet' is a totally
+      valid answer."
+3. After each answer, acknowledge it briefly and ask the next question. Do not batch
+   questions -- let the user think through each one.
+4. After you have answers for at least the project description, core loop, and platform,
+   draft the brief with what you have and proceed to Branch A.
+5. Remaining unknown fields get marked: `(not yet defined -- we'll figure this out as we go)`.
 
 ### Question Guidelines (All Branches)
 
@@ -256,9 +261,9 @@ This page serves as the persistent dashboard for the entire design-crit process.
 brief stage, it shows:
 
 - The confirmed brief, formatted cleanly with all eight fields
-- A status banner: "Brief confirmed. Next: Facet Planning."
-- Visual indicators per field (filled/partial/unknown)
+- A status banner: "Brief confirmed. Next up: we'll plan which design areas to review."
 - Project metadata: name, platform, tech stack
+- No scoring indicators, no color-coded field status. Just clean content.
 
 Requirements:
 - Self-contained HTML with inline CSS. No external dependencies.
@@ -271,8 +276,9 @@ Requirements:
 
 After the brief is confirmed, state is updated, and overview is generated:
 
-1. Announce to the user: "Brief confirmed. Moving to facet planning -- I'll analyze the brief
-   and recommend which design facets to evaluate for [project name]."
+1. Explain what happens next in plain terms: "Great, the brief is locked in. Next, I'll
+   figure out which design areas we should review together — things like navigation,
+   layout, colors, typography. I'll come back with a plan for your project specifically."
 2. Invoke `design-crit:facet-planning` to continue the pipeline.
 
 Do not wait for additional user input before handing off. The pipeline continues automatically.

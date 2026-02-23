@@ -1,7 +1,7 @@
 # Brief Template
 
 Reference for the `design-brief` skill. Defines what an optimal brief contains, how
-to score context sufficiency, and what good and bad briefs look like.
+to assess available context, and what good and bad briefs look like.
 
 The brief is a scoping tool, not a brainstorming tool. Show what you know, highlight
 what you don't. A few good questions produce dramatically better wireframes.
@@ -53,31 +53,21 @@ If unknown, write "unknown — will audit in accessibility facet." Seeds the fin
 
 ---
 
-## Evaluation Rubric
+## How Much Do You Know?
 
-Score each field: **filled**, **partial**, or **empty**.
+Internally assess how much context you have. This determines your approach — but never
+expose this assessment to the user. No scores, no rubrics, no "sufficiency levels."
 
-| Field                  | Filled                              | Partial                          | Empty   |
-|------------------------|-------------------------------------|----------------------------------|---------|
-| Name + description     | Clear one-liner                     | Vague or too long                | Missing |
-| Target users           | Persona + device + context          | Has persona, missing context     | Missing |
-| Core interaction loop  | One clear sentence                  | Multiple competing loops         | Missing |
-| Differentiator         | Stated (even "none")                | Implied but not explicit         | Missing |
-| Platform + constraints | Platform + stack + device targets   | Platform only                    | Missing |
-| Scope                  | In-scope and out-of-scope listed    | In-scope only                    | Missing |
-| Design language        | References or "none" stated         | Partial references               | Missing |
-| Accessibility          | Requirements stated or "unknown"    | Vague mention                    | Missing |
+**You know a lot** — Core loop + platform + scope are clear; most other fields have
+substance. Draft the full brief yourself and present it for the user to review.
 
-### Sufficiency Levels
+**You know some** — You have a partial picture but critical pieces are missing (what
+users actually do, what platform, or what's in v1). Draft what you can and ask 2-3
+specific questions to fill the gaps.
 
-**Sufficient** — Core loop + platform + scope are filled; remaining fields filled or
-partial. Action: draft the full brief, present it, ask user to confirm or adjust.
-
-**Partial** — Some fields filled, but core loop, platform, or scope has gaps. Action:
-draft what you can, ask 2-3 targeted questions for the critical gaps only.
-
-**Minimal** — Most fields empty; vague idea, not a scoped project. Action: guide brief
-creation field by field (name, then core loop, then platform). One question at a time.
+**You're starting from scratch** — Vague idea, barely any detail. Walk the user through
+it conversationally, one question at a time, starting with what it is, what users do
+in it, and what platform it runs on.
 
 ---
 
@@ -97,7 +87,7 @@ Design language: shadcn/ui, Inter font, neutral palette — no existing brand
 Accessibility: WCAG AA, full keyboard navigation, screen reader support
 ```
 
-Sufficiency: **Sufficient**. Every field filled. Draft and present for confirmation.
+You know a lot here. Every field is clear. Draft and present for confirmation.
 
 ### Minimal Brief (vague idea)
 
@@ -112,8 +102,8 @@ Design language: (empty)
 Accessibility: (empty)
 ```
 
-Sufficiency: **Minimal**. Only the name and a tentative platform exist. Start guided
-brief creation. Example opening questions:
+You're starting from scratch here. Only the name and a tentative platform exist.
+Walk through it conversationally. Example opening questions:
 1. "What does a user do every day in your habit tracker?" (core loop)
 2. "Phone app, web app, or both?" (platform)
 3. "What habits — fitness, learning, general?" (differentiator + scope)

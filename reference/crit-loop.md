@@ -46,23 +46,30 @@ Each option is a card containing, in order:
    - **Keep** / **Cut** toggle buttons (mutually exclusive, default unset)
    - **Comment** textarea (placeholder: "What works? What doesn't?")
 
-### Comparative Take
+### My Take (Comparative Recommendation)
 
-Below all option cards, render a section titled **"My Take"**. This is the LLM's overall
-read across all options -- like a designer saying "here's my recommendation and why." Write
-this in `critique.md` and embed it in the compare view.
+**Full-width below all option cards** — NOT inside the card grid. This section spans
+the entire content column and is visually distinct from the option cards above. See
+`./crit-ui.md` Section 6 for exact styling.
+
+This is the LLM's overall read across all options — like a designer stepping back and
+saying "here's my recommendation and why." Write this in `critique.md` and embed it
+in the compare view. It should feel prominent and opinionated, not buried.
 
 ### Global Feedback Area
 
-Below the comparative take, render:
+Below My Take, render:
 
+- A brief instruction: "Use the Keep/Cut buttons above, or just head back to the chat
+  and tell me what you think."
 - **Direction notes** textarea (placeholder: "Overall thoughts or direction preferences...")
 - Three action buttons in a row:
   - **Save Feedback** (primary) -- writes `feedback-round-N.json`
-  - **Skip This Facet** (secondary) -- writes feedback with `"decision": "skip"`
+  - **Skip This Area** (secondary) -- writes feedback with `"decision": "skip"`
   - **Decide For Me** (secondary) -- writes feedback with `"decision": "delegate"`
 - Optional: **Delegate context** textarea, shown when "Decide For Me" is clicked
   (placeholder: "Any guidance? e.g., 'prioritize accessibility' or 'keep it simple'")
+- A note below the buttons: "After saving, head back to the terminal to continue."
 
 ### Dark Mode Toggle
 
@@ -84,6 +91,24 @@ Each option lives at `.design-crit/facets/{facet-id}/option-{x}.html`.
   directly in a browser tab).
 - Use a `<meta name="viewport" content="width=device-width, initial-scale=1">` tag.
 - Use a descriptive `<title>` matching the option name.
+
+### Content Constraints for Iframed Display
+
+Option files are primarily viewed inside iframes in the compare view. Design them to
+be **scannable at a glance**, not pages that require scrolling to understand.
+
+**Rules:**
+- **Fit the viewport.** The wireframe should communicate its design concept within a
+  single viewport (roughly 16:10 aspect ratio at ~600px height). Minimal or no scrolling.
+- **Show the pattern, not the content.** Use 3-5 representative items, not 20. Show one
+  complete interaction, not every edge case. The wireframe demonstrates the *structure*,
+  not the *content*.
+- **No long text blocks.** Labels, short headlines, and placeholders only. If explaining
+  the concept requires paragraphs, that belongs in the rationale text outside the iframe.
+- **Single-screen focus.** Each option shows ONE screen or ONE state. Multi-screen flows
+  should be broken into separate options or shown as a simplified flow diagram.
+- **Scale-friendly.** Text must be legible at the iframe display size (~400-600px wide).
+  Use 13-16px base font sizes. Avoid tiny details that require zooming.
 
 ### Persistence Across Rounds
 
@@ -119,17 +144,24 @@ Claude writes:
 
 User acts:
   9. Reviews compare.html side by side
-  10. Marks Keep/Cut per option, writes comments
-  11. Clicks Save Feedback (or Skip / Decide For Me)
-  12. Browser writes feedback-round-N.json to disk
+  10. Either:
+      a. Uses the browser UI (marks Keep/Cut, writes comments, clicks Save Feedback)
+         AND THEN comes back to the terminal and says "I've submitted my feedback"
+      b. OR simply comes back to the terminal and describes their preferences
+         in their own words ("I like option A, cut B, maybe tweak C's spacing")
 
 Next turn:
-  13. User returns to Claude Code (or Claude detects the feedback file)
-  14. Claude reads feedback -> refine survivors / generate new options / suggest locking
+  11. Claude reads feedback (from JSON file if saved, or from user's chat message)
+  12. Claude refines survivors / generates new options / suggests locking
 ```
 
+**IMPORTANT: The chat is always the primary feedback channel.** The browser UI is a
+convenience, not a requirement. Always tell the user they can share their thoughts
+directly in the chat. If they use the browser Save Feedback button, remind them to
+come back to the terminal afterward so you know they're ready to continue.
+
 **IMPORTANT: Do NOT read prior facets' full HTML option files during the crit loop.** Use
-`crit-session.md` for prior decisions. See Section 7 (Context Efficiency) for the
+`crit-session.md` for prior decisions. See Section 8 (Context Efficiency) for the
 full loading strategy.
 
 ### Feedback JSON Schema
@@ -188,13 +220,13 @@ This is soft guidance, not enforced. Most facets resolve in 2 rounds.
 
 ### Escalating Lock Prompts
 
-After each round, ask the user with increasing directness:
+After each round, ask the user with increasing directness. Use plain, conversational
+language — no jargon like "lock" or "converge":
 
-- **Round 1:** "Want to refine the survivors, or do you already see the direction?"
-- **Round 2:** "Ready to lock this, or one more refinement pass?"
-- **Round 3:** "I'd recommend locking. The remaining differences are details for implementation."
-- **Round 4+:** "We've been on this one for a while. What's the ONE thing still unresolved?
-  Let's nail that and lock it."
+- **Round 1:** "What do you think — want to keep refining, or do you already see the direction you like?"
+- **Round 2:** "I think we're getting close. Ready to go with one of these, or want one more pass?"
+- **Round 3:** "I'd recommend picking one and moving on. The remaining differences are small details we can work out later."
+- **Round 4+:** "We've been on this one for a while. What's the ONE thing that's still bugging you? Let's nail that and move on."
 
 ### Convergence Tone
 
@@ -326,7 +358,52 @@ reasons, final decision + rationale, and whether user-decided or LLM-delegated.
 
 ---
 
-## 7. Context Efficiency
+## 7. Chat Hygiene
+
+### Suppress HTML Output in the Terminal
+
+When generating HTML files (option files, compare.html, overview.html), **do not dump
+the full HTML source into the chat.** The user does not need to see raw HTML — it makes
+the conversation hard to follow.
+
+Instead:
+- Write HTML files silently using the Write tool.
+- After writing, tell the user what you did in plain language: "I've generated 3 options
+  and a comparison view. Opening it in your browser now."
+- If the user asks to see the HTML source, show it then. Otherwise, keep it behind the
+  scenes.
+
+### Guide the User After Each Step
+
+After opening a compare view or overview page, always tell the user:
+1. What you just showed them and why
+2. What you want them to do next
+3. That they should come back to the chat when they're ready
+
+Example after opening a compare view:
+```
+I've generated 3 navigation options and opened them side by side in your browser.
+
+Take a look and let me know:
+- Which options do you want to keep exploring?
+- Which ones should we cut?
+- Any specific feedback on what works or doesn't?
+
+You can use the Keep/Cut buttons in the browser, or just tell me here in the chat.
+```
+
+### Generation Speed
+
+HTML generation for the initial round can take a while since it produces multiple full
+wireframe files plus the compare view. To keep this manageable:
+- For round 1, keep wireframes focused and simple. Show the design concept clearly
+  without excessive detail or placeholder content.
+- Increase fidelity in later rounds as options narrow.
+- Tell the user upfront: "This will take a moment — I'm building out the wireframes."
+
+---
+
+## 8. Context Efficiency
 
 HTML option files can be large. A full design crit with 10+ facets generates substantial
 content. These rules keep context usage sustainable across long sessions.

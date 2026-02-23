@@ -12,10 +12,14 @@ Your job is to determine where the project stands and route to the correct sub-s
 
 ## Pipeline Stages
 
-1. **Design Brief** -- gather context, scope the project, confirm the brief
-2. **Facet Planning** -- select which design facets to evaluate, set ordering
-3. **Facet Crit Loops** -- for each facet, generate options, run compare/feedback rounds, lock a direction
-4. **Design Direction** -- synthesize all locked decisions into a coherent deliverable
+1. **Design Brief** -- understand the project, scope what we're designing
+2. **Review Plan** -- pick which design areas to work through and in what order
+3. **Design Reviews** -- for each area, generate options, compare side by side, refine until locked
+4. **Design Direction** -- synthesize all decisions into a coherent deliverable
+
+**User-facing language:** Always say "design area" or just "area" when talking to the
+user. Never say "facet" in user-facing output. The user should never see internal terms
+like "facet library", "crit loop", or "facet planning."
 
 ---
 
@@ -66,8 +70,8 @@ where they left off.
 
 `brief_status` is `"confirmed"` and `facets` is empty (`[]`).
 
-Action: Invoke `design-crit:facet-planning`. Tell the user the brief is set and it is
-time to plan which design facets to evaluate.
+Action: Invoke `design-crit:facet-planning`. Tell the user the brief is set and you'll
+now figure out which design areas to review together.
 
 ### Rule C: Facet plan confirmed, facets in progress
 
@@ -160,9 +164,9 @@ routing.
 
 Example re-entry message:
 
-> Your design crit for Remarc has 3 of 10 facets locked. You are on round 2 of
-> Typography with 2 options surviving. I see feedback from your last round -- let me
-> continue from there.
+> Your design review for Remarc is in progress — 3 of 10 areas are done. We're on
+> round 2 of Typography with 2 options still in the running. I see your feedback from
+> last time — let me pick up from there.
 
 ---
 
@@ -175,8 +179,9 @@ When a facet skill reports that it has locked a decision (or the user skipped a 
 3. Regenerate overview.html (Step 4).
 4. Open the overview page so the user sees progress.
 5. Identify the next facet per Rule C logic.
-6. Announce the transition: "Navigation is locked as Deep Sidebar. Next up: Layout.
-   This builds on your locked navigation and screen inventory."
+6. Announce the transition conversationally: "Navigation is locked — we're going with
+   the Deep Sidebar approach. Next up: Layout. This builds on the navigation decisions
+   we just made."
 7. Invoke the next facet's skill.
 
 If the facet that just locked was the last one, follow Rule D instead.

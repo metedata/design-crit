@@ -72,8 +72,13 @@ buttons, `--accent` fill on active. Dark mode toggle (visual facets only): small
 ## 5. Option Cards (compare.html)
 
 Card: `--surface-raised`, subtle border, `8px` radius, no shadow. Iframe fills card width
-with `aspect-ratio: 16/10`, `border-radius: 8px 8px 0 0`, inset shadow
+with `min-height: 480px` (not a fixed aspect ratio — let the iframe be tall enough to
+show the wireframe without internal scrolling). `border-radius: 8px 8px 0 0`, inset shadow
 `inset 0 0 0 1px rgba(255,255,255,0.04)`.
+
+For 2-option layouts, iframes can be even taller (`min-height: 560px`) since there is more
+horizontal space. The goal: the wireframe is visible at a glance without scrolling inside
+the iframe.
 
 Below iframe: "Open in new tab" link (11px, `--text-muted`, right-aligned). Option name
 (15px/600/`--text-primary`). Three rationale sections with 11px uppercase labels
@@ -94,9 +99,20 @@ exclusive toggle.
 
 ## 6. My Take Section (compare.html)
 
-Below all cards. `--surface-overlay` background, `8px` radius, `3px solid var(--accent)`
-left border, `24px` padding, `32px` top margin. Title: 18px/600. Body: 13px/`--text-secondary`,
-`max-width: 680px`.
+**Full-width below all option cards.** This is NOT a card in the grid — it spans the
+entire content column width, visually separated from the options above.
+
+Container: `--surface-overlay` background, `8px` radius, `3px solid var(--accent)` left
+border, `24px 32px` padding, `48px` top margin. `max-width: 100%` of the content area
+(not `680px` — it should be as wide as the option grid above it).
+
+Title: 18px/600/`--text-primary`, with a subtle accent-colored label "MY TAKE" in 11px
+uppercase above it. Body: 14px (slightly larger than card body text)/`--text-secondary`,
+`line-height: 1.6`, `max-width: 720px` for readable line length within the full-width
+container.
+
+This section should feel like the designer stepping back and giving their overall read —
+prominent, opinionated, and easy to find. It should never be confused with an option card.
 
 ---
 
@@ -106,7 +122,7 @@ Direction notes textarea: same input styling, `min-height: 100px`, max-width `68
 
 **Button row** (flex, `12px` gap, `16px` top margin):
 - **Save Feedback** -- `--accent` fill, white text, no border (primary).
-- **Skip This Facet** / **Decide For Me** -- transparent, `--text-secondary`,
+- **Skip This Area** / **Decide For Me** -- transparent, `--text-secondary`,
   `--border-subtle` border (ghost).
 
 Delegate textarea: hidden, slides open (`200ms ease-out`) on "Decide For Me" click.
