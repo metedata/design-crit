@@ -50,7 +50,7 @@ designed.
 
 ---
 
-## 2. Assess What You Know
+## 2. Assess Available Context
 
 Read `../../reference/brief-template.md` now. It contains the brief schema and examples.
 
@@ -65,21 +65,22 @@ A good brief covers eight things:
 7. **Existing design language** -- component library, brand, references, or "none"
 8. **Accessibility requirements** -- WCAG level, keyboard, screen reader, or "unknown"
 
-Internally assess how much you know. **Never expose this assessment to the user.** No
-scores, no rubrics, no "sufficiency" labels. Just figure out which branch to take:
+Internally assess how much context is available from the codebase and what the user has
+said. **Never expose this assessment to the user.** No scores, no rubrics, no labels.
+Just figure out which branch to take:
 
-**You know a lot** -- Core loop + platform + scope are clear. You can draft a complete brief.
+**Rich context** -- Core loop + platform + scope are clear. You can draft a complete brief.
 
-**You know some** -- Critical fields like core loop, platform, or scope have gaps. You need
-2-3 answers before you can write a solid brief.
+**Partial context** -- Critical fields like core loop, platform, or scope have gaps. You
+need 2-3 answers before you can write a solid brief.
 
-**Starting from scratch** -- Most fields empty. You need to walk the user through it.
+**Thin context** -- Most fields empty. You need to walk the user through it.
 
 ---
 
-## 3. Branch by What You Know
+## 3. Branch by Available Context
 
-### Branch A: You Know a Lot
+### Branch A: Rich Context
 
 You have enough to write the brief without asking questions.
 
@@ -110,7 +111,7 @@ You have enough to write the brief without asking questions.
 9. If the user provides edits, update the brief and regenerate overview.html. Repeat until
    confirmed.
 
-### Branch B: You Know Some
+### Branch B: Partial Context
 
 You can draft most of the brief but critical fields are missing.
 
@@ -134,7 +135,7 @@ You can draft most of the brief but critical fields are missing.
 5. After receiving answers, merge them into the draft and proceed to Branch A (present
    in terminal + generate overview.html, ask follow-up questions).
 
-### Branch C: Starting from Scratch
+### Branch C: Thin Context
 
 Most fields are empty. You need to learn about the project first.
 

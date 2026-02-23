@@ -53,20 +53,22 @@ If unknown, write "unknown — will audit in accessibility facet." Seeds the fin
 
 ---
 
-## How Much Do You Know?
+## How Much Context Is Available?
 
-Internally assess how much context you have. This determines your approach — but never
-expose this assessment to the user. No scores, no rubrics, no "sufficiency levels."
+Internally assess how much context exists between the codebase and what the user has
+said. This determines your approach — but never expose this assessment to the user.
+No scores, no rubrics, no labels.
 
-**You know a lot** — Core loop + platform + scope are clear; most other fields have
-substance. Draft the full brief yourself and present it for the user to review.
+**Rich context** — Core loop + platform + scope are clear from the codebase and user
+description; most other fields have substance. Draft the full brief yourself and
+present it for the user to review.
 
-**You know some** — You have a partial picture but critical pieces are missing (what
+**Partial context** — Some fields are clear but critical pieces are missing (what
 users actually do, what platform, or what's in v1). Draft what you can and ask 2-3
 specific questions to fill the gaps.
 
-**You're starting from scratch** — Vague idea, barely any detail. Walk the user through
-it conversationally, one question at a time, starting with what it is, what users do
+**Thin context** — Vague idea, barely any detail. Walk the user through it
+conversationally, one question at a time, starting with what it is, what users do
 in it, and what platform it runs on.
 
 ---
@@ -87,7 +89,7 @@ Design language: shadcn/ui, Inter font, neutral palette — no existing brand
 Accessibility: WCAG AA, full keyboard navigation, screen reader support
 ```
 
-You know a lot here. Every field is clear. Draft and present for confirmation.
+Rich context — every field is clear. Draft and present for confirmation.
 
 ### Minimal Brief (vague idea)
 
@@ -102,7 +104,7 @@ Design language: (empty)
 Accessibility: (empty)
 ```
 
-You're starting from scratch here. Only the name and a tentative platform exist.
+Thin context — only the name and a tentative platform exist.
 Walk through it conversationally. Example opening questions:
 1. "What does a user do every day in your habit tracker?" (core loop)
 2. "Phone app, web app, or both?" (platform)

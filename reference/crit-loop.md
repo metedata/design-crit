@@ -42,7 +42,9 @@ Each option is a card containing, in order:
      Tie back to the brief.
    - **WORKS WELL FOR** -- Scenarios, user types, or contexts where this approach shines.
    - **WATCH OUT FOR** -- Honest trade-offs. What could go wrong, what this sacrifices.
-4. **Per-option controls:**
+4. **Option label** -- A prominent letter label ("A", "B", "C") so the user can
+   reference options easily if they prefer to give feedback in the chat instead.
+5. **Per-option controls:**
    - **Keep** / **Cut** toggle buttons (mutually exclusive, default unset)
    - **Comment** textarea (placeholder: "What works? What doesn't?")
 
@@ -60,8 +62,6 @@ in the compare view. It should feel prominent and opinionated, not buried.
 
 Below My Take, render:
 
-- A brief instruction: "Use the Keep/Cut buttons above, or just head back to the chat
-  and tell me what you think."
 - **Direction notes** textarea (placeholder: "Overall thoughts or direction preferences...")
 - Three action buttons in a row:
   - **Save Feedback** (primary) -- writes `feedback-round-N.json`
@@ -69,7 +69,8 @@ Below My Take, render:
   - **Decide For Me** (secondary) -- writes feedback with `"decision": "delegate"`
 - Optional: **Delegate context** textarea, shown when "Decide For Me" is clicked
   (placeholder: "Any guidance? e.g., 'prioritize accessibility' or 'keep it simple'")
-- A note below the buttons: "After saving, head back to the terminal to continue."
+- **Instruction text** above the button row: "After saving, just type 'done' in the
+  terminal to continue."
 
 ### Dark Mode Toggle
 
@@ -142,23 +143,63 @@ Claude writes:
   7. compare.html             -> regenerated, iframes current options
   8. Open compare.html in the user's browser
 
+Claude waits:
+  9. Immediately start a Bash poll for the feedback file (see Auto-Detect below).
+  10. Tell the user: "Take your time reviewing. I'll pick up your feedback
+      automatically when you click Save — or just come back and tell me
+      what you think."
+
 User acts:
-  9. Reviews compare.html side by side
-  10. Either:
-      a. Uses the browser UI (marks Keep/Cut, writes comments, clicks Save Feedback)
-         AND THEN comes back to the terminal and says "I've submitted my feedback"
-      b. OR simply comes back to the terminal and describes their preferences
-         in their own words ("I like option A, cut B, maybe tweak C's spacing")
+  11. Reviews compare.html side by side
+  12. Marks Keep/Cut per option, writes comments in the browser UI
+  13. Clicks Save Feedback (browser writes feedback-round-N.json to disk)
+  14. Browser shows a notification: "Feedback saved! Claude is picking it up."
+
+Auto-detect:
+  15. The Bash poll detects the new file and returns its contents
+  16. Claude processes the feedback — no user typing required
+
+  OR (alternative — chat-only feedback):
+  11b. User returns to the terminal and describes preferences in their own words
+       ("Keep A, cut C, tweak B's spacing"). This interrupts the Bash poll.
+  12b. Claude parses the chat message and writes feedback-round-N.json itself.
 
 Next turn:
-  11. Claude reads feedback (from JSON file if saved, or from user's chat message)
-  12. Claude refines survivors / generates new options / suggests locking
+  17. Claude refines survivors / generates new options / suggests locking
 ```
 
-**IMPORTANT: The chat is always the primary feedback channel.** The browser UI is a
-convenience, not a requirement. Always tell the user they can share their thoughts
-directly in the chat. If they use the browser Save Feedback button, remind them to
-come back to the terminal afterward so you know they're ready to continue.
+### Auto-Detect: Bash File Polling
+
+After opening the compare view, Claude immediately starts a Bash command that watches
+for the feedback file. This lets Claude pick up feedback automatically — the user
+clicks Save Feedback in the browser and Claude resumes without any terminal typing.
+
+**Implementation:**
+```bash
+# Poll for the feedback file, timeout after 5 minutes
+FEEDBACK=".design-crit/facets/{facet-id}/feedback-round-{N}.json"
+timeout 300 bash -c "while [ ! -f \"$FEEDBACK\" ]; do sleep 2; done" && cat "$FEEDBACK"
+```
+
+Run this as a background Bash tool call. If the file appears, the command returns its
+contents and Claude continues. If the user types something in the chat instead (the
+alternative path), that interrupts the poll naturally.
+
+**If the poll times out** (user is taking a long time or the File System Access API
+failed), Claude asks: "Still reviewing? No rush. When you're ready, just tell me your
+thoughts here — like 'keep A, cut C' — and I'll take it from there."
+
+### Two Feedback Paths
+
+Both paths are valid and the user can use whichever is more natural:
+
+1. **Browser UI (automatic)** — Use Keep/Cut buttons + comments, click Save Feedback.
+   Claude detects the file automatically. Best for detailed, per-option feedback.
+2. **Chat (manual)** — Describe preferences in the terminal. Claude parses and records it.
+   Best for quick decisions or when the File System Access API is unavailable.
+
+Tell the user both options exist. Emphasize that the browser path is automatic — they
+don't need to do anything in the terminal after clicking Save Feedback.
 
 **IMPORTANT: Do NOT read prior facets' full HTML option files during the crit loop.** Use
 `crit-session.md` for prior decisions. See Section 8 (Context Efficiency) for the
@@ -191,17 +232,34 @@ Valid `decision` values:
 
 Valid `action` values per option: `"keep"`, `"cut"`, or `null` (no action taken).
 
-### Save Feedback Implementation
+### Save Feedback Implementation (Browser Path)
 
-The compare.html inline JS must handle saving without a server:
+The compare.html inline JS handles saving when the user clicks Save Feedback:
 
 1. **Primary: File System Access API.** Use `window.showSaveFilePicker` with suggested
-   filename `feedback-round-{N}.json`. Serialize form state to JSON, write via
-   `FileSystemWritableFileStream`. Detect with `if ('showSaveFilePicker' in window)`.
+   filename `feedback-round-{N}.json` and suggested start directory pointing to the
+   facet folder. Serialize form state to JSON, write via `FileSystemWritableFileStream`.
+   Detect with `if ('showSaveFilePicker' in window)`.
 
-2. **Fallback: Copy-paste.** Show a modal with JSON in a `<textarea>`, a "Copy to Clipboard"
-   button, and instructions: "Paste this into Claude Code, or save as
-   `feedback-round-{N}.json` in your facet folder."
+2. **After successful save**, show a confirmation banner in the compare view:
+   "Feedback saved! Claude is picking it up automatically."
+   Also fire an OS notification if permission is granted:
+   ```javascript
+   if (Notification.permission === 'granted') {
+     new Notification('Design Crit', { body: 'Feedback saved! Claude is processing it.' });
+   }
+   ```
+   Request notification permission on page load with a brief explanation.
+
+3. **Fallback (File System Access API unavailable):** Show a modal with the JSON in a
+   copyable `<textarea>` and instructions: "Paste this into the terminal and Claude
+   will process it."
+
+### Feedback Persistence (Chat Path)
+
+When the user gives feedback in the chat instead of using the browser UI, Claude parses
+their message and writes `feedback-round-N.json` itself. This ensures session resilience
+regardless of which feedback path the user chose.
 
 ---
 
@@ -272,12 +330,14 @@ Suggest "I can decide this one for you if you'd like" when:
 
 ### How It Works
 
-1. User clicks "Decide For Me" (optionally adding context in the delegate textarea)
-2. Compare.html writes feedback with `"decision": "delegate"` and any `"delegate_context"`
-3. Claude picks the best option based on: the brief, locked decisions from prior facets,
-   design best practices, and any delegate context provided
-4. Claude writes a full rationale -- same quality as a regular critique, not a silent auto-pick
-5. Claude locks the decision with `"decided_by": "llm"` in state.json
+1. User clicks "Decide For Me" in the browser (optionally adding context in the
+   delegate textarea), OR says "you decide" in the chat.
+2. If triggered from browser, compare.html writes feedback with `"decision": "delegate"`
+   and any `"delegate_context"`. User types "done" in terminal.
+3. Claude picks the best option based on: the brief, locked decisions from prior areas,
+   design best practices, and any delegate context provided.
+4. Claude writes a full rationale — same quality as a regular critique, not a silent auto-pick.
+5. Claude locks the decision with `"decided_by": "llm"` in state.json.
 
 ### Delegation Feedback JSON
 
@@ -384,12 +444,12 @@ Example after opening a compare view:
 ```
 I've generated 3 navigation options and opened them side by side in your browser.
 
-Take a look and let me know:
-- Which options do you want to keep exploring?
-- Which ones should we cut?
-- Any specific feedback on what works or doesn't?
+Take your time — for each option, you can mark it as Keep or Cut and leave
+comments right in the browser. When you're done, click Save Feedback and I'll
+pick it up automatically.
 
-You can use the Keep/Cut buttons in the browser, or just tell me here in the chat.
+Or if you prefer, just tell me your thoughts here in the chat — something like
+"keep A, cut C, tweak B's spacing" works great too.
 ```
 
 ### Generation Speed

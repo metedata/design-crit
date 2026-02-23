@@ -85,6 +85,10 @@ Below iframe: "Open in new tab" link (11px, `--text-muted`, right-aligned). Opti
 (`WHY THIS OPTION` / `WORKS WELL FOR` / `WATCH OUT FOR`) in `--text-muted` and 13px body
 in `--text-secondary`. Spacing: `8px` label-to-body, `16px` between sections.
 
+**Option label:** A prominent letter label ("A", "B", "C") displayed at the top-left of
+each card, 18px/600/`--accent`, so users can reference options easily in the chat as
+an alternative to using the Keep/Cut buttons.
+
 **Keep/Cut pills:** Outline by default (`--border-subtle`). Active Keep: filled
 `--status-success`, dark text. Active Cut: filled `--status-error`, dark text. Mutually
 exclusive toggle.
@@ -92,8 +96,9 @@ exclusive toggle.
 **Comment textarea:** `--surface-input`, `--border-subtle` border, `6px` radius,
 `min-height: 60px`, `resize: vertical`, 13px `--font-ui`, placeholder in `--text-muted`.
 
-**Eliminated cards:** `opacity: 0.5`, "CUT" badge (11px uppercase, `--status-error` border,
-`4px 8px` padding, top-right of iframe). Hidden when filter = Surviving.
+**Eliminated cards (round 2+):** `opacity: 0.5`, "CUT" badge (11px uppercase,
+`--status-error` border, `4px 8px` padding, top-right of iframe). Hidden when
+filter = Surviving.
 
 ---
 
@@ -126,6 +131,9 @@ Direction notes textarea: same input styling, `min-height: 100px`, max-width `68
   `--border-subtle` border (ghost).
 
 Delegate textarea: hidden, slides open (`200ms ease-out`) on "Decide For Me" click.
+
+**Instruction text** above the button row (13px, `--text-muted`): "Click Save Feedback
+and Claude will pick it up automatically. Or just tell Claude your thoughts in the chat."
 
 ---
 
