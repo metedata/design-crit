@@ -15,6 +15,10 @@ with gaps explicitly called out. For rich-context projects, the user confirms in
 For vague ideas, the highlighted gaps are honest: "I don't know what makes your habit tracker
 different from the 500 that exist. That matters for design."
 
+**This entire stage happens in the terminal.** No interactive HTML. No browser-based forms.
+You present the brief, ask questions, and get confirmation -- all in the chat. A read-only
+overview page is generated at the very end as a reference.
+
 ---
 
 ## 1. Context Harvesting
@@ -87,54 +91,31 @@ You have enough to write the brief without asking questions.
 1. Draft the full brief in the schema format. Fill every field from harvested context.
 2. For any field you inferred or guessed, flag it inline:
    `(inferred from routes -- confirm this is complete)`.
-3. **Present the brief in the terminal first.** Show it directly in the chat so the user
-   can read it without leaving the terminal. Use clean markdown formatting.
-4. Generate `.design-crit/overview.html` showing the draft brief. The HTML must be:
-   - Self-contained (inline CSS, no external dependencies).
-   - Readable on desktop. Clean typography, clear section headings.
-   - A note at the top: "This brief was drafted from your codebase and description.
-     Review it, edit any field, then confirm."
-   - **An editable textarea for each field** so the user can adjust values inline.
-     Pre-fill with the drafted content. Textareas auto-resize to fit content.
-   - **A Confirm Brief button** (primary, styled per `crit-ui.md`).
-   - **A Request Changes button** (secondary) that reveals a general notes textarea
-     for broader feedback that doesn't fit into a single field.
-   - On Confirm: serialize the brief fields to JSON and write
-     `.design-crit/brief-confirmation.json` via the File System Access API.
-     Show a banner: "Brief confirmed! Claude is picking it up."
-     Fire an OS notification if permission is granted.
-   - Fallback if File System Access API is unavailable: show a copyable JSON textarea
-     with instructions to paste into the terminal.
-5. Open `overview.html` in the user's browser.
-6. **Ask 2-3 specific follow-up questions** in the terminal to sharpen the brief. Even
-   when you have strong context, there are always design-relevant details the codebase
-   cannot tell you. Examples:
+3. **Present the brief directly in the chat.** Show it as clean markdown so the user
+   can read it without leaving the terminal. This is the primary way they review it.
+4. **Ask 2-3 specific follow-up questions** to sharpen the brief. Even when you have
+   strong context, there are always design-relevant details the codebase cannot tell you.
+   Examples:
    - "Your app has a dashboard and settings page. Is there a primary action users take
      most often, or is it more of a monitoring tool?"
-   - "I see you're using Tailwind — do you have a visual style in mind, or should we
+   - "I see you're using Tailwind -- do you have a visual style in mind, or should we
      explore that from scratch?"
    - "Is this mostly for desktop users, or do you need it to work well on phones too?"
-7. **Tell the user both feedback paths:**
-   "You can edit the brief and confirm it right in the browser — I'll pick it up
-   automatically. Or just tell me your changes here in the chat."
-8. **Start a Bash poll** for the confirmation file:
-   ```bash
-   timeout 300 bash -c 'while [ ! -f ".design-crit/brief-confirmation.json" ]; do sleep 2; done' && cat ".design-crit/brief-confirmation.json"
-   ```
-   If the file appears, read it and apply any edits the user made. If the user
-   responds in the chat instead, that interrupts the poll — parse their message
-   and apply changes.
-9. If the user provides edits (from either path), update the brief and regenerate
-   overview.html. Repeat until confirmed.
+5. **Wait for the user to respond.** They will either:
+   - Confirm ("looks good", "that's right")
+   - Request changes ("change X to Y", "the core loop is actually...")
+   - Answer your follow-up questions
+6. If the user requests changes, update the brief and present the updated version.
+   Repeat until they confirm.
+7. Once confirmed, proceed to Section 4 (Write the Brief).
 
 ### Branch B: Partial Context
 
 You can draft most of the brief but critical fields are missing.
 
 1. Draft every field you can fill. Leave unknown fields marked clearly.
-2. **Present what you have so far in the terminal.** Show it in the chat so the user
-   can see your progress. Frame it conversationally: "Here's what I've pieced together
-   so far. I have a few questions before I can finish the brief."
+2. **Present what you have so far in the chat.** Frame it conversationally: "Here's what
+   I've pieced together so far. I have a few questions before I can finish the brief."
 3. Ask the user 2-3 targeted questions for the critical gaps. Be specific, not generic.
    Prioritize in this order:
    - Core interaction loop (if missing, nothing else matters)
@@ -148,8 +129,8 @@ You can draft most of the brief but critical fields are missing.
    - BAD: "What's the scope?"
    - GOOD: "I see routes for dashboard, settings, and a profile page. Is there anything else
      in v1, or is that the full surface area?"
-5. After receiving answers, merge them into the draft and proceed to Branch A (present
-   in terminal + generate overview.html, ask follow-up questions).
+5. After receiving answers, merge them into the draft and proceed to Branch A step 3
+   (present full brief in chat, ask follow-ups, wait for confirmation).
 
 ### Branch C: Thin Context
 
@@ -168,7 +149,7 @@ Most fields are empty. You need to learn about the project first.
 3. After each answer, acknowledge it briefly and ask the next question. Do not batch
    questions -- let the user think through each one.
 4. After you have answers for at least the project description, core loop, and platform,
-   draft the brief with what you have and proceed to Branch A.
+   draft the brief with what you have and proceed to Branch A step 3.
 5. Remaining unknown fields get marked: `(not yet defined -- we'll figure this out as we go)`.
 
 ### Question Guidelines (All Branches)
@@ -185,8 +166,7 @@ Most fields are empty. You need to learn about the project first.
 
 ## 4. Write the Brief
 
-Once the user confirms (or you have enough to draft after Branch B/C questioning), write
-the final brief.
+Once the user confirms, write the final brief.
 
 ### File: `.design-crit/brief.md`
 
@@ -272,18 +252,25 @@ Do NOT overwrite existing facet data if the user is re-running the brief mid-pip
 
 ## 6. Generate Overview HTML
 
-After confirming the brief, generate or update `.design-crit/overview.html`.
+After confirming the brief and updating state, generate `.design-crit/overview.html`.
 
-This page serves as the persistent dashboard for the entire design-crit process. At the
-brief stage, it shows:
+This is a **read-only** dashboard -- not interactive. No editable fields, no buttons, no
+forms. It shows the confirmed brief as a clean, formatted reference page.
 
+Contents:
 - The confirmed brief, formatted cleanly with all eight fields
 - A status banner: "Brief confirmed. Next up: we'll plan which design areas to review."
 - Project metadata: name, platform, tech stack
-- No scoring indicators, no color-coded field status. Just clean content.
+
+**Do NOT include:**
+- Editable fields or textareas
+- Confirm/submit buttons
+- Scoring indicators, colored dots, or field status badges
+- Any interactive JavaScript
 
 Requirements:
 - Self-contained HTML with inline CSS. No external dependencies.
+- Follow `../../reference/crit-ui.md` for colors, typography, and spacing.
 - Desktop-first, clean typography, readable at a glance.
 - Open it in the user's browser after generating.
 
@@ -294,7 +281,7 @@ Requirements:
 After the brief is confirmed, state is updated, and overview is generated:
 
 1. Explain what happens next in plain terms: "Great, the brief is locked in. Next, I'll
-   figure out which design areas we should review together — things like navigation,
+   figure out which design areas we should review together -- things like navigation,
    layout, colors, typography. I'll come back with a plan for your project specifically."
 2. Invoke `design-crit:facet-planning` to continue the pipeline.
 
@@ -308,7 +295,7 @@ Do not wait for additional user input before handing off. The pipeline continues
 |---|---|---|
 | Brief | `.design-crit/brief.md` | The confirmed design brief |
 | State | `.design-crit/state.json` | Pipeline state with `brief_status: confirmed` |
-| Overview | `.design-crit/overview.html` | Visual dashboard showing the brief |
+| Overview | `.design-crit/overview.html` | Read-only dashboard showing the brief |
 
 ---
 
@@ -316,6 +303,8 @@ Do not wait for additional user input before handing off. The pipeline continues
 
 - **Show your work.** Present the brief as YOUR draft, not a form for the user to fill out.
   You did the research. You wrote the brief. The user reviews and confirms.
+- **Everything happens in the chat.** Present the brief in the terminal, ask questions in
+  the terminal, confirm in the terminal. The HTML overview is just a reference artifact.
 - **Purposeful friction.** The 2-3 questions you ask in Branch B are not bureaucracy -- they
   produce dramatically better wireframes downstream. Frame them that way.
 - **Gaps are honest.** "Unknown" is better than a guess. The crit process will surface these

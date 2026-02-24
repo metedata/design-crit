@@ -17,6 +17,9 @@ A note-taking app and a data dashboard need different areas in different orders.
 user. Never say "facet" in user-facing output. Internally, the code and file paths
 still use "facet" -- that is fine. The user should never see that term.
 
+**This entire stage happens in the terminal.** Present the plan conversationally, get
+confirmation in the chat. A read-only overview HTML is generated as a reference only.
+
 ---
 
 ## 1. Load References
@@ -149,51 +152,7 @@ State the deviation and why: "Promoting color-system before density-spacing beca
 
 ---
 
-## 5. Generate Overview HTML
-
-Generate `.design-crit/overview.html` with the proposed plan. This is a visual reference,
-but NOT the primary way the user interacts. The terminal conversation is the primary flow.
-
-### Layout
-
-Build a single-page HTML file with all CSS and JS inlined. No external dependencies.
-Follow `./crit-ui.md` for styling.
-
-**Header section:**
-- Project name and one-line description from the brief
-- A clear explanation: "Here's the plan for your design review. We'll work through each
-  area together, one at a time."
-
-**Plan section:**
-- Ordered list of proposed areas, grouped by phase with plain labels:
-  - **"Defining the product"** (structural) -- what screens exist, edge cases, onboarding
-  - **"Arranging the pieces"** (compositional) -- navigation, layout, component patterns
-  - **"Making it feel right"** (sensory) -- typography, colors, spacing, motion
-- Each area shows: sequence number, human-readable name, one-sentence rationale
-- No technical skill names, no dependency arrows, no lens tags
-- Checkboxes for enable/disable (checked by default)
-
-**Interactive controls:**
-- Checkboxes for enable/disable per area (checked by default for included areas)
-- Drag handles on each row for reordering (use native HTML5 drag-and-drop)
-- **Confirm Plan** button (primary, styled per `../../reference/crit-ui.md`)
-- **Reset to Default** button (secondary) — restores the LLM's original proposal
-- On Confirm: serialize the plan state (enabled areas, order) to JSON and write
-  `.design-crit/facet-plan-confirmation.json` via the File System Access API.
-  Show a banner: "Plan confirmed! Claude is picking it up."
-  Fire an OS notification if permission is granted.
-- Fallback if File System Access API is unavailable: show a copyable JSON textarea
-  with instructions to paste into the terminal.
-
-### Styling
-
-Follow `../../reference/crit-ui.md` for all styling (dark chrome, clean typography).
-
----
-
-## 6. Present the Plan Conversationally
-
-After generating `overview.html`, open it in the user's browser.
+## 5. Present the Plan Conversationally
 
 **The terminal is the primary interface.** Present the plan conversationally. Explain
 what you're proposing and why, as if you're a designer walking a client through the
@@ -210,24 +169,22 @@ to nail down.
 Here's the order I'm proposing:
 
 FIRST, WE DEFINE WHAT EXISTS:
-  1. Screen Inventory — figure out what screens we need and how they connect
-  2. Edge States — what happens when things are empty, loading, or broken
+  1. Screen Inventory -- figure out what screens we need and how they connect
+  2. Edge States -- what happens when things are empty, loading, or broken
   ...
 
 THEN, WE ARRANGE THE PIECES:
-  3. Navigation — how users move between screens
-  4. Layout — how content is organized on each screen
+  3. Navigation -- how users move between screens
+  4. Layout -- how content is organized on each screen
   ...
 
 FINALLY, WE MAKE IT FEEL RIGHT:
-  7. Typography — fonts, sizes, hierarchy
-  8. Colors — palette, meaning, contrast
+  7. Typography -- fonts, sizes, hierarchy
+  8. Colors -- palette, meaning, contrast
   ...
 
 AND A FINAL CHECK:
-  [N]. Accessibility — making sure everything works for everyone
-
-I've also opened a visual version of this plan in your browser.
+  [N]. Accessibility -- making sure everything works for everyone
 
 Does this plan look right? You can:
 - Remove areas you don't think we need
@@ -241,17 +198,49 @@ Does this plan look right? You can:
   design review looks like.
 - Use everyday language. "Figure out what screens we need" not "screen inventory and
   state maps."
-- Tell the user both feedback paths: "You can confirm or adjust the plan right in
-  the browser — I'll pick it up automatically. Or just tell me here in the chat."
 
-**Start a Bash poll** for the confirmation file after opening the overview:
-```bash
-timeout 300 bash -c 'while [ ! -f ".design-crit/facet-plan-confirmation.json" ]; do sleep 2; done' && cat ".design-crit/facet-plan-confirmation.json"
-```
-If the file appears, read it and apply the user's changes. If the user responds in
-the chat instead ("looks good", or requests changes), that interrupts the poll.
+**Wait for the user to confirm or request changes.** If they want changes, apply them
+and present the updated plan. Repeat until they confirm.
 
-If the user requests changes (from either path), apply them and regenerate `overview.html`.
+---
+
+## 6. Generate Overview HTML
+
+After the user confirms the plan, generate `.design-crit/overview.html` with the
+confirmed plan.
+
+This is a **read-only** reference page -- not interactive. No checkboxes, no drag handles,
+no buttons, no forms, no JavaScript interactivity.
+
+### Layout
+
+Build a single-page HTML file with all CSS and JS inlined. No external dependencies.
+Follow `../../reference/crit-ui.md` for styling.
+
+**Header section:**
+- Project name and one-line description from the brief
+- A status note: "Plan confirmed. Starting design reviews."
+
+**Plan section:**
+- Ordered list of confirmed areas, grouped by phase with plain labels:
+  - **"Defining the product"** (structural) -- what screens exist, edge cases, onboarding
+  - **"Arranging the pieces"** (compositional) -- navigation, layout, component patterns
+  - **"Making it feel right"** (sensory) -- typography, colors, spacing, motion
+- Each area shows: sequence number, human-readable name, one-sentence rationale
+- No technical skill names, no dependency arrows, no lens tags
+- Status indicator per area: pending (empty circle), in-progress (pulsing), locked (filled)
+
+**Do NOT include:**
+- Checkboxes, drag handles, or reorder controls
+- Confirm/submit buttons
+- Editable fields
+- File System Access API or any write-to-disk JavaScript
+
+### Styling
+
+Follow `../../reference/crit-ui.md` for all styling (dark chrome, clean typography).
+
+Open in the user's browser after generating.
 
 ---
 
@@ -280,10 +269,6 @@ Set `current_facet` to the first facet's id (always `screen-inventory`).
 Set `current_round` to 1.
 
 Set `facet_plan_status` to `"confirmed"` on the root object. Include the `project` block (name, description, platform, tech_stack) and `brief_status: "confirmed"` from the prior stage.
-
-### Regenerate overview.html
-
-Update `overview.html` to reflect the confirmed plan. Replace "Confirm Plan" with a "Plan Confirmed" indicator. Each facet now shows status (pending/in-progress/locked) and updates as crits progress.
 
 ### Hand Off
 

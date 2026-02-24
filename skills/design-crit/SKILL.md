@@ -106,7 +106,7 @@ after deliverables are generated).
 
 Action: Generate the overview page (Step 4). Summarize the completed crit with all locked
 facets and deliverable links (`direction.html`, `design-tokens.json`, `decisions.md`).
-Offer: "Review any facet", "Re-crit a facet" (invoke its skill directly), or "Start a
+Offer: "Review any area", "Re-crit an area" (invoke its skill directly), or "Start a
 new crit" (reset state.json).
 
 ---

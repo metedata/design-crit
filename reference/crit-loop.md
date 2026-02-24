@@ -117,8 +117,8 @@ Below My Take, render:
   - **Decide For Me** (secondary) -- writes feedback with `"decision": "delegate"`
 - Optional: **Delegate context** textarea, shown when "Decide For Me" is clicked
   (placeholder: "Any guidance? e.g., 'prioritize accessibility' or 'keep it simple'")
-- **Instruction text** above the button row: "After saving, just type 'done' in the
-  terminal to continue."
+- **Instruction text** above the button row: "Click Save Feedback and Claude will pick
+  it up automatically. Or just tell Claude your thoughts in the chat."
 
 ### Dark Mode Toggle
 
@@ -223,24 +223,40 @@ Next turn:
 
 ### Auto-Detect: Bash File Polling
 
-After opening the compare view, Claude immediately starts a Bash command that watches
-for the feedback file. This lets Claude pick up feedback automatically — the user
-clicks Save Feedback in the browser and Claude resumes without any terminal typing.
+**CRITICAL: You MUST start this Bash poll immediately after opening the compare view.**
+This is what makes the browser-to-terminal feedback loop work automatically. Without it,
+the user has to manually type feedback in the chat.
 
-**Implementation:**
+After opening the compare view, start this Bash command using the Bash tool:
+
 ```bash
-# Poll for the feedback file, timeout after 5 minutes
+# REQUIRED: Poll for the feedback file, timeout after 5 minutes
+# Replace {facet-id} and {N} with actual values
 FEEDBACK=".design-crit/facets/{facet-id}/feedback-round-{N}.json"
 timeout 300 bash -c "while [ ! -f \"$FEEDBACK\" ]; do sleep 2; done" && cat "$FEEDBACK"
 ```
 
-Run this as a background Bash tool call. If the file appears, the command returns its
-contents and Claude continues. If the user types something in the chat instead (the
-alternative path), that interrupts the poll naturally.
+**How it works:**
+1. Claude runs this command via the Bash tool immediately after opening compare.html.
+2. The command blocks, checking every 2 seconds for the feedback file.
+3. When the user clicks Save Feedback in the browser, the File System Access API writes
+   the JSON file to disk.
+4. The poll detects the file and returns its contents to Claude.
+5. Claude processes the feedback and continues — no user typing required.
 
-**If the poll times out** (user is taking a long time or the File System Access API
-failed), Claude asks: "Still reviewing? No rush. When you're ready, just tell me your
-thoughts here — like 'keep A, cut C' — and I'll take it from there."
+**If the user types in the chat instead**, that naturally interrupts the poll. Claude
+parses their chat message and writes feedback-round-N.json itself.
+
+**If the poll times out** (5 minutes), Claude asks: "Still reviewing? No rush. When
+you're ready, just tell me your thoughts here — like 'keep A, cut C' — and I'll take
+it from there."
+
+**The sequence after generating compare.html is always:**
+1. Open compare.html in the browser
+2. Tell the user: "Take your time reviewing. I'll pick up your feedback automatically
+   when you click Save — or just come back and tell me what you think."
+3. Start the Bash poll (the command above)
+4. Wait for either the poll to return or the user to type something
 
 ### Two Feedback Paths
 
@@ -287,26 +303,211 @@ Valid `action` values per option: `"keep"`, `"cut"`, or `null` (no action taken)
 
 ### Save Feedback Implementation (Browser Path)
 
-The compare.html inline JS handles saving when the user clicks Save Feedback:
+The compare.html **MUST** include this JavaScript for the Save Feedback button. This is
+not optional -- without it, the browser-to-terminal feedback loop does not work.
 
-1. **Primary: File System Access API.** Use `window.showSaveFilePicker` with suggested
-   filename `feedback-round-{N}.json` and suggested start directory pointing to the
-   facet folder. Serialize form state to JSON, write via `FileSystemWritableFileStream`.
-   Detect with `if ('showSaveFilePicker' in window)`.
+**Include this exact JavaScript in every compare.html** (with `FACET_ID`, `ROUND_N`, and
+`FEEDBACK_FILENAME` replaced with actual values):
 
-2. **After successful save**, show a confirmation banner in the compare view:
-   "Feedback saved! Claude is picking it up automatically."
-   Also fire an OS notification if permission is granted:
-   ```javascript
-   if (Notification.permission === 'granted') {
-     new Notification('Design Crit', { body: 'Feedback saved! Claude is processing it.' });
-   }
-   ```
-   Request notification permission on page load with a brief explanation.
+```javascript
+// --- REQUIRED: Save Feedback to Disk ---
+// Replace these values when generating compare.html:
+const FACET_ID = '{facet-id}';       // e.g., 'navigation-model'
+const ROUND_N = {N};                  // e.g., 2
+const FEEDBACK_FILENAME = 'feedback-round-{N}.json';
 
-3. **Fallback (File System Access API unavailable):** Show a modal with the JSON in a
-   copyable `<textarea>` and instructions: "Paste this into the terminal and Claude
-   will process it."
+// Request notification permission on page load
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
+
+function collectFeedback() {
+  const options = {};
+  document.querySelectorAll('[data-option-id]').forEach(card => {
+    const id = card.dataset.optionId;
+    const keepBtn = card.querySelector('[data-action="keep"]');
+    const cutBtn = card.querySelector('[data-action="cut"]');
+    const comment = card.querySelector('textarea')?.value || '';
+    let action = null;
+    if (keepBtn?.classList.contains('active')) action = 'keep';
+    if (cutBtn?.classList.contains('active')) action = 'cut';
+    options[id] = { action, comment };
+  });
+
+  const overall = document.querySelector('#direction-notes')?.value || '';
+
+  // Determine decision type
+  let decision = 'refine';
+  const keptCount = Object.values(options).filter(o => o.action === 'keep').length;
+  const totalOptions = Object.keys(options).length;
+  if (keptCount === 1 && Object.values(options).filter(o => o.action === 'cut').length === totalOptions - 1) {
+    decision = 'lock';
+  }
+
+  return {
+    facet: FACET_ID,
+    round: ROUND_N,
+    timestamp: new Date().toISOString(),
+    options,
+    overall,
+    decision
+  };
+}
+
+async function saveFeedback() {
+  const feedback = collectFeedback();
+  const json = JSON.stringify(feedback, null, 2);
+
+  // Primary: File System Access API
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: FEEDBACK_FILENAME,
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+
+      // Show success banner
+      showBanner('Feedback saved! Claude is picking it up automatically.');
+
+      // Fire OS notification
+      if (Notification.permission === 'granted') {
+        new Notification('Design Crit', { body: 'Feedback saved! Claude is processing it.' });
+      }
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return; // User cancelled
+      console.error('File System Access API failed:', err);
+    }
+  }
+
+  // Fallback: show copyable JSON
+  showFallbackModal(json);
+}
+
+function saveFeedbackWithDecision(decision) {
+  // For Skip This Area or Decide For Me buttons
+  const feedback = collectFeedback();
+  feedback.decision = decision;
+  if (decision === 'delegate') {
+    feedback.delegate_context = document.querySelector('#delegate-context')?.value || '';
+  }
+  const json = JSON.stringify(feedback, null, 2);
+  // Same save logic as above...
+  if ('showSaveFilePicker' in window) {
+    window.showSaveFilePicker({
+      suggestedName: FEEDBACK_FILENAME,
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+    }).then(async handle => {
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      showBanner('Feedback saved! Claude is picking it up automatically.');
+      if (Notification.permission === 'granted') {
+        new Notification('Design Crit', { body: 'Feedback saved! Claude is processing it.' });
+      }
+    }).catch(err => {
+      if (err.name !== 'AbortError') showFallbackModal(json);
+    });
+  } else {
+    showFallbackModal(json);
+  }
+}
+
+function showBanner(message) {
+  const banner = document.createElement('div');
+  banner.textContent = message;
+  banner.style.cssText = 'position:fixed;top:56px;left:50%;transform:translateX(-50%);' +
+    'background:#4ADE80;color:#0D0D0F;padding:12px 24px;border-radius:8px;font-size:14px;' +
+    'font-weight:600;z-index:200;animation:fadeIn 0.2s ease-out';
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 5000);
+}
+
+function showFallbackModal(json) {
+  const modal = document.createElement('div');
+  modal.innerHTML = `
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center">
+      <div style="background:#1A1A1E;border:1px solid #1E1E22;border-radius:8px;padding:24px;max-width:600px;width:90%">
+        <h3 style="color:#F0F0F2;margin:0 0 8px">Save not available in this browser</h3>
+        <p style="color:#8B8B92;font-size:13px;margin:0 0 16px">Copy this JSON and paste it into the terminal:</p>
+        <textarea style="width:100%;min-height:200px;background:#111113;color:#F0F0F2;border:1px solid #1E1E22;border-radius:6px;padding:12px;font-family:monospace;font-size:12px;resize:vertical"
+          readonly onclick="this.select()">${json}</textarea>
+        <button onclick="this.closest('div[style]').parentElement.remove()"
+          style="margin-top:12px;padding:10px 20px;background:#6366F1;color:white;border:none;border-radius:6px;cursor:pointer">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+```
+
+**Required HTML structure for interactive controls** (each option card must include):
+
+```html
+<!-- Option card — data-option-id is REQUIRED for feedback collection -->
+<div class="option-card" data-option-id="option-a">
+  <!-- ... iframe, name, rationale sections ... -->
+
+  <!-- Keep/Cut toggle buttons — REQUIRED -->
+  <div class="option-controls">
+    <button data-action="keep" onclick="toggleAction(this, 'keep')">Keep</button>
+    <button data-action="cut" onclick="toggleAction(this, 'cut')">Cut</button>
+  </div>
+
+  <!-- Comment textarea — REQUIRED -->
+  <textarea placeholder="What works? What doesn't?"></textarea>
+</div>
+```
+
+```html
+<!-- Global feedback area — below My Take section -->
+<div class="feedback-area">
+  <p class="instruction-text">Click Save Feedback and Claude will pick it up
+  automatically. Or just tell Claude your thoughts in the chat.</p>
+
+  <textarea id="direction-notes" placeholder="Overall thoughts or direction preferences..."></textarea>
+
+  <div class="button-row">
+    <button class="primary" onclick="saveFeedback()">Save Feedback</button>
+    <button class="ghost" onclick="saveFeedbackWithDecision('skip')">Skip This Area</button>
+    <button class="ghost" onclick="showDelegateContext()">Decide For Me</button>
+  </div>
+
+  <!-- Hidden until "Decide For Me" clicked -->
+  <textarea id="delegate-context" style="display:none"
+    placeholder="Any guidance? e.g., 'prioritize accessibility' or 'keep it simple'"></textarea>
+</div>
+```
+
+**The Keep/Cut toggle JS:**
+
+```javascript
+function toggleAction(btn, action) {
+  const card = btn.closest('[data-option-id]');
+  const keepBtn = card.querySelector('[data-action="keep"]');
+  const cutBtn = card.querySelector('[data-action="cut"]');
+
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    return;
+  }
+
+  keepBtn.classList.remove('active');
+  cutBtn.classList.remove('active');
+  btn.classList.add('active');
+}
+
+function showDelegateContext() {
+  const el = document.querySelector('#delegate-context');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+```
+
+**Every compare.html you generate MUST include all of the above.** Do not generate a
+compare view without interactive controls. The Keep/Cut buttons, comment textareas,
+Save Feedback button, and File System Access API JavaScript are mandatory.
 
 ### Feedback Persistence (Chat Path)
 
