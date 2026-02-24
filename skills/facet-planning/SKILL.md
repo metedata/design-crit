@@ -173,13 +173,21 @@ Follow `./crit-ui.md` for styling.
 - No technical skill names, no dependency arrows, no lens tags
 - Checkboxes for enable/disable (checked by default)
 
-**No File System Access API buttons.** Do not include a "Confirm Plan" button that
-writes to disk. The user confirms in the terminal.
+**Interactive controls:**
+- Checkboxes for enable/disable per area (checked by default for included areas)
+- Drag handles on each row for reordering (use native HTML5 drag-and-drop)
+- **Confirm Plan** button (primary, styled per `../../reference/crit-ui.md`)
+- **Reset to Default** button (secondary) — restores the LLM's original proposal
+- On Confirm: serialize the plan state (enabled areas, order) to JSON and write
+  `.design-crit/facet-plan-confirmation.json` via the File System Access API.
+  Show a banner: "Plan confirmed! Claude is picking it up."
+  Fire an OS notification if permission is granted.
+- Fallback if File System Access API is unavailable: show a copyable JSON textarea
+  with instructions to paste into the terminal.
 
 ### Styling
 
-Follow `./crit-ui.md` for all styling (dark chrome, clean typography). The overview
-page is an informational reference, not an interactive tool.
+Follow `../../reference/crit-ui.md` for all styling (dark chrome, clean typography).
 
 ---
 
@@ -233,10 +241,17 @@ Does this plan look right? You can:
   design review looks like.
 - Use everyday language. "Figure out what screens we need" not "screen inventory and
   state maps."
-- Make it clear what you want: their approval or edits, via the chat.
-- The user confirms by replying in the terminal. No File System Access API buttons.
+- Tell the user both feedback paths: "You can confirm or adjust the plan right in
+  the browser — I'll pick it up automatically. Or just tell me here in the chat."
 
-If the user requests changes, apply them and regenerate `overview.html`.
+**Start a Bash poll** for the confirmation file after opening the overview:
+```bash
+timeout 300 bash -c 'while [ ! -f ".design-crit/facet-plan-confirmation.json" ]; do sleep 2; done' && cat ".design-crit/facet-plan-confirmation.json"
+```
+If the file appears, read it and apply the user's changes. If the user responds in
+the chat instead ("looks good", or requests changes), that interrupts the poll.
+
+If the user requests changes (from either path), apply them and regenerate `overview.html`.
 
 ---
 

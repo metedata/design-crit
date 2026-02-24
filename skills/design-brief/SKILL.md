@@ -92,24 +92,40 @@ You have enough to write the brief without asking questions.
 4. Generate `.design-crit/overview.html` showing the draft brief. The HTML must be:
    - Self-contained (inline CSS, no external dependencies).
    - Readable on desktop. Clean typography, clear section headings.
-   - No color-coded scoring indicators. Present each field cleanly.
-   - A note at the top: "This brief was drafted from your codebase and description."
+   - A note at the top: "This brief was drafted from your codebase and description.
+     Review it, edit any field, then confirm."
+   - **An editable textarea for each field** so the user can adjust values inline.
+     Pre-fill with the drafted content. Textareas auto-resize to fit content.
+   - **A Confirm Brief button** (primary, styled per `crit-ui.md`).
+   - **A Request Changes button** (secondary) that reveals a general notes textarea
+     for broader feedback that doesn't fit into a single field.
+   - On Confirm: serialize the brief fields to JSON and write
+     `.design-crit/brief-confirmation.json` via the File System Access API.
+     Show a banner: "Brief confirmed! Claude is picking it up."
+     Fire an OS notification if permission is granted.
+   - Fallback if File System Access API is unavailable: show a copyable JSON textarea
+     with instructions to paste into the terminal.
 5. Open `overview.html` in the user's browser.
-6. **Ask 2-3 specific follow-up questions** to sharpen the brief. Even when you have
-   strong context, there are always design-relevant details the codebase cannot tell you.
-   Examples:
+6. **Ask 2-3 specific follow-up questions** in the terminal to sharpen the brief. Even
+   when you have strong context, there are always design-relevant details the codebase
+   cannot tell you. Examples:
    - "Your app has a dashboard and settings page. Is there a primary action users take
      most often, or is it more of a monitoring tool?"
    - "I see you're using Tailwind — do you have a visual style in mind, or should we
      explore that from scratch?"
    - "Is this mostly for desktop users, or do you need it to work well on phones too?"
-7. **Tell the user explicitly how to provide feedback:**
-   "I've also opened a formatted version in your browser. To continue, just reply here
-   in the chat — tell me what looks right, what needs changing, or say 'looks good' to
-   move on."
-8. Wait for the user to respond in the chat.
-9. If the user provides edits, update the brief and regenerate overview.html. Repeat until
-   confirmed.
+7. **Tell the user both feedback paths:**
+   "You can edit the brief and confirm it right in the browser — I'll pick it up
+   automatically. Or just tell me your changes here in the chat."
+8. **Start a Bash poll** for the confirmation file:
+   ```bash
+   timeout 300 bash -c 'while [ ! -f ".design-crit/brief-confirmation.json" ]; do sleep 2; done' && cat ".design-crit/brief-confirmation.json"
+   ```
+   If the file appears, read it and apply any edits the user made. If the user
+   responds in the chat instead, that interrupts the poll — parse their message
+   and apply changes.
+9. If the user provides edits (from either path), update the brief and regenerate
+   overview.html. Repeat until confirmed.
 
 ### Branch B: Partial Context
 
